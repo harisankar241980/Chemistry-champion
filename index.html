@@ -688,18 +688,57 @@
       }, 1000);
     }
 
-    function handleShortSubmit() {
-      if (locked) return;
-      const input = document.getElementById("shortAnswerInput");
-      if (!input) return;
-      const value = input.value.trim();
-      const msg = document.querySelector(".message");
-      const correctTextEl = document.getElementById("correctText");
+   function handleShortSubmit() {
+  if (locked) return;
+  const input = document.getElementById("shortAnswerInput");
+  if (!input) return;
+  const value = input.value.trim();
+  const msg = document.querySelector(".message");
+  const correctTextEl = document.getElementById("correctText");
 
-      if (!value) {
-        if (msg) msg.textContent = "Please type an answer before submitting.";
-        return;
-      }
+  if (!value) {
+    if (msg) msg.textContent = "Please type an answer before submitting.";
+    return;
+  }
+
+  locked = true;
+  clearInterval(timerId);
+
+  const q = questions[current];
+  const normalized = value.toLowerCase();
+  const acceptable = (q.acceptableAnswers || []).map(a => a.toLowerCase());
+  const isCorrect = acceptable.some(
+    ans => normalized === ans || normalized.includes(ans)
+  );
+
+  if (isCorrect) {
+    score += 10;
+    scoreEl.textContent = score;
+    if (msg) {
+      msg.textContent = "✅ Correct! +10 points.";
+      msg.classList.add("highlight");
+    }
+    if (correctTextEl) correctTextEl.textContent = "";
+    playCorrectSound();
+  } else {
+    const correctExample =
+      (q.acceptableAnswers && q.acceptableAnswers[0]) || "Check your textbook.";
+    if (msg) {
+      msg.textContent =
+        '❌ Not correct. Correct answer (example): "' + correctExample + '".';
+      msg.classList.remove("highlight");
+    }
+    if (correctTextEl) {
+      correctTextEl.textContent =
+        'Example correct answer: "' + correctExample + '"';
+    }
+    playWrongSound();
+  }
+
+  setTimeout(() => {
+    nextQuestionOrEnd();
+  }, 1600);
+}
 
       locked = true;
       clearInterval(timerId);
@@ -1012,3 +1051,4 @@
   </script>
 </body>
 </html>
+
