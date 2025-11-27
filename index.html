@@ -1,837 +1,661 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Chemistry Champion – CBSE 10</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    body {
-      background: #020617;
-      color: #e5e7eb;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .app {
-      width: 100%;
-      max-width: 520px;
-      background: #020617;
-      border-radius: 24px;
-      border: 1px solid #1f2937;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.45);
-      padding: 16px 16px 20px;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-      gap: 8px;
-    }
-    .title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      line-height: 1.3;
-    }
-    .title span {
-      color: #34d399;
-    }
-    .subtitle {
-      font-size: 0.75rem;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-    .score-box {
-      text-align: right;
-      font-size: 0.8rem;
-    }
-    .score-label {
-      color: #d1d5db;
-    }
-    .score-value {
-      font-weight: 600;
-      color: #34d399;
-      font-size: 1rem;
-    }
-    .timer {
-      margin-top: 4px;
-      font-size: 0.8rem;
-      color: #fbbf24;
-    }
-    .progress {
-      width: 100%;
-      height: 6px;
-      border-radius: 999px;
-      background: #1f2937;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-    .progress-inner {
-      height: 100%;
-      background: #34d399;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-    .card {
-      background: rgba(15,23,42,0.95);
-      border-radius: 18px;
-      border: 1px solid #1f2937;
-      padding: 12px;
-      margin-bottom: 10px;
-    }
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      color: #9ca3af;
-      margin-bottom: 8px;
-    }
-    .prize {
-      color: #fbbf24;
-      font-weight: 600;
-    }
-    .question-text {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    .options {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-    @media (min-width: 420px) {
-      .options {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-    .option-btn {
-      border-radius: 14px;
-      border: 1px solid #374151;
-      background: rgba(15,23,42,0.9);
-      color: #e5e7eb;
-      padding: 10px;
-      font-size: 0.85rem;
-      text-align: left;
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-    }
-    .option-btn span.label {
-      font-family: monospace;
-      color: #34d399;
-      font-size: 0.8rem;
-    }
-    .option-btn:hover {
-      border-color: #34d399;
-      background: #111827;
-    }
-    .option-btn.correct {
-      background: #34d399;
-      border-color: #bbf7d0;
-      color: #022c22;
-    }
-    .option-btn.wrong {
-      background: #fb7185;
-      border-color: #fecaca;
-      color: #111827;
-    }
-    .option-btn.disabled {
-      cursor: default;
-      opacity: 0.95;
-    }
-    .footer-row {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    @media (min-width: 420px) {
-      .footer-row {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-      }
-    }
-    .message {
-      font-size: 0.75rem;
-      color: #9ca3af;
-    }
-    .message.highlight {
-      color: #34d399;
+import React, { useState } from "react";
+
+// Simple CBSE Class 10 Chemistry KBC-style quiz game
+// Drop this component into a React app (e.g., App.jsx) and render it.
+
+const QUESTIONS = [
+  {
+    level: "Easy",
+    money: "₹1,000",
+    question: "Which gas is released when Zinc reacts with Hydrochloric acid?",
+    options: ["Oxygen", "Carbon dioxide", "Hydrogen", "Nitrogen"],
+    correctIndex: 2,
+    score: 10,
+    hint: "It is a colourless gas that burns with a pop sound.",
+  },
+  {
+    level: "Easy",
+    money: "₹2,000",
+    question: "Which of the following is a base?",
+    options: ["HCl", "H₂SO₄", "NaOH", "CO₂"],
+    correctIndex: 2,
+    score: 10,
+    hint: "It is a common strong alkali used in soaps.",
+  },
+  {
+    level: "Easy",
+    money: "₹5,000",
+    question: "Burning of a candle is an example of which type of reaction?",
+    options: ["Endothermic", "Exothermic", "Displacement", "Photochemical"],
+    correctIndex: 1,
+    score: 10,
+    hint: "Does it release heat or absorb heat?",
+  },
+  {
+    level: "Medium",
+    money: "₹10,000",
+    question: "The chemical formula of washing soda is:",
+    options: ["NaCl", "Na₂CO₃·10H₂O", "NaHCO₃", "CaCO₃"],
+    correctIndex: 1,
+    score: 15,
+    hint: "It is hydrated sodium carbonate.",
+  },
+  {
+    level: "Medium",
+    money: "₹20,000",
+    question: "Which metal is stored in kerosene?",
+    options: ["Iron", "Sodium", "Copper", "Aluminium"],
+    correctIndex: 1,
+    score: 15,
+    hint: "It is a very soft and highly reactive metal.",
+  },
+  {
+    level: "Medium",
+    money: "₹40,000",
+    question: "Identify the reaction: CaO + H₂O → Ca(OH)₂",
+    options: ["Decomposition", "Displacement", "Combination", "Double displacement"],
+    correctIndex: 2,
+    score: 15,
+    hint: "Two substances combine to form a single product.",
+  },
+  {
+    level: "Medium",
+    money: "₹80,000",
+    question: "What happens to blue litmus paper in an acid?",
+    options: ["Turns red", "Turns green", "No change", "Turns yellow"],
+    correctIndex: 0,
+    score: 15,
+    hint: "Acids turn this colour.",
+  },
+  {
+    level: "Hard",
+    money: "₹1,60,000",
+    question: "What is corrosion?",
+    options: [
+      "Shining of metals",
+      "Damage of metals by air and moisture",
+      "Formation of bases",
+      "Reaction of metal with acid only",
+    ],
+    correctIndex: 1,
+    score: 20,
+    hint: "Think of rusting of iron.",
+  },
+  {
+    level: "Hard",
+    money: "₹3,20,000",
+    question: "On strong heating, CaCO₃ gives:",
+    options: ["Ca + CO₂", "CaO + CO₂", "Ca(OH)₂ + CO₂", "CaO + H₂O"],
+    correctIndex: 1,
+    score: 20,
+    hint: "It decomposes into calcium oxide and a gas.",
+  },
+  {
+    level: "Hard",
+    money: "₹6,40,000",
+    question: "Which is more reactive: Sodium or Calcium?",
+    options: ["Calcium", "Sodium", "Both same", "None"],
+    correctIndex: 1,
+    score: 20,
+    hint: "It is placed above the other in the reactivity series.",
+  },
+  // --- Added: Acids, Bases & Salts (10 questions) ---
+  {
+    level: "Medium",
+    money: "₹7,50,000",
+    question: "Which acid is present in lemon?",
+    options: ["Acetic acid", "Citric acid", "Hydrochloric acid", "Sulphuric acid"],
+    correctIndex: 1,
+    score: 15,
+    hint: "It is named after citrus fruits.",
+  },
+  {
+    level: "Medium",
+    money: "₹8,00,000",
+    question: "Which base is used in making soap?",
+    options: ["Calcium hydroxide", "Sodium hydroxide", "Ammonium hydroxide", "Potassium nitrate"],
+    correctIndex: 1,
+    score: 15,
+    hint: "Also called caustic soda.",
+  },
+  {
+    level: "Medium",
+    money: "₹8,50,000",
+    question: "What is the pH value of a neutral solution?",
+    options: ["0", "7", "14", "5"],
+    correctIndex: 1,
+    score: 15,
+    hint: "It lies exactly in the middle of the pH scale.",
+  },
+  {
+    level: "Medium",
+    money: "₹9,00,000",
+    question: "Which gas is produced when an acid reacts with a metal carbonate?",
+    options: ["Oxygen", "Hydrogen", "Carbon dioxide", "Nitrogen"],
+    correctIndex: 2,
+    score: 15,
+    hint: "It turns lime water milky.",
+  },
+  {
+    level: "Medium",
+    money: "₹9,50,000",
+    question: "Which salt is called baking soda?",
+    options: ["NaCl", "NaHCO₃", "Na₂CO₃", "CaCO₃"],
+    correctIndex: 1,
+    score: 15,
+    hint: "Used in cakes and bread.",
+  },
+  {
+    level: "Hard",
+    money: "₹10,00,000",
+    question: "Which acid is present in the stomach?",
+    options: ["Sulphuric acid", "Nitric acid", "Hydrochloric acid", "Citric acid"],
+    correctIndex: 2,
+    score: 20,
+    hint: "Helps in digestion.",
+  },
+  {
+    level: "Hard",
+    money: "₹11,00,000",
+    question: "Tooth decay starts when pH of mouth falls below:",
+    options: ["7.0", "6.5", "5.5", "4.5"],
+    correctIndex: 2,
+    score: 20,
+    hint: "It is slightly acidic.",
+  },
+  {
+    level: "Hard",
+    money: "₹12,00,000",
+    question: "Which salt is used to remove hardness of water?",
+    options: ["Baking soda", "Washing soda", "Bleaching powder", "Common salt"],
+    correctIndex: 1,
+    score: 20,
+    hint: "Used in laundry and softening water.",
+  },
+  {
+    level: "Hard",
+    money: "₹13,00,000",
+    question: "Which indicator is naturally obtained from lichens?",
+    options: ["Litmus", "Methyl orange", "Phenolphthalein", "Turmeric"],
+    correctIndex: 0,
+    score: 20,
+    hint: "Used to test acids and bases.",
+  },
+  {
+    level: "Hard",
+    money: "₹15,00,000",
+    question: "Which substance is used to neutralize acidic soil in farms?",
+    options: ["Slaked lime", "Baking soda", "Vinegar", "Bleaching powder"],
+    correctIndex: 0,
+    score: 20,
+    hint: "It is calcium hydroxide.",
+  },
+
+  // --- Added: Metals & Non-metals (10 questions) ---
+  {
+    level: "Easy",
+    money: "₹16,00,000",
+    question: "Which of the following is a non-metal?",
+    options: ["Iron", "Copper", "Sulphur", "Aluminium"],
+    correctIndex: 2,
+    score: 10,
+    hint: "It is a yellow coloured non-metal.",
+  },
+  {
+    level: "Easy",
+    money: "₹17,00,000",
+    question: "Which metal is liquid at room temperature?",
+    options: ["Iron", "Mercury", "Aluminium", "Sodium"],
+    correctIndex: 1,
+    score: 10,
+    hint: "Used in thermometers.",
+  },
+  {
+    level: "Medium",
+    money: "₹18,00,000",
+    question: "Which gas is essential for combustion?",
+    options: ["Hydrogen", "Carbon dioxide", "Oxygen", "Nitrogen"],
+    correctIndex: 2,
+    score: 15,
+    hint: "Supports burning.",
+  },
+  {
+    level: "Medium",
+    money: "₹19,00,000",
+    question: "Which metal is used for galvanisation of iron?",
+    options: ["Copper", "Zinc", "Silver", "Lead"],
+    correctIndex: 1,
+    score: 15,
+    hint: "Coating prevents rusting.",
+  },
+  {
+    level: "Medium",
+    money: "₹20,00,000",
+    question: "Which property of metals allows them to be drawn into wires?",
+    options: ["Malleability", "Ductility", "Conductivity", "Sonority"],
+    correctIndex: 1,
+    score: 15,
+    hint: "Used in making electric wires.",
+  },
+  {
+    level: "Hard",
+    money: "₹21,00,000",
+    question: "Which metal is extracted by electrolysis?",
+    options: ["Iron", "Zinc", "Aluminium", "Copper"],
+    correctIndex: 2,
+    score: 20,
+    hint: "Obtained from bauxite.",
+  },
+  {
+    level: "Hard",
+    money: "₹22,00,000",
+    question: "Which non-metal is the best conductor of electricity?",
+    options: ["Sulphur", "Carbon (graphite)", "Phosphorus", "Chlorine"],
+    correctIndex: 1,
+    score: 20,
+    hint: "Used in pencils.",
+  },
+  {
+    level: "Hard",
+    money: "₹23,00,000",
+    question: "Which metal is the main constituent of steel?",
+    options: ["Aluminium", "Copper", "Iron", "Nickel"],
+    correctIndex: 2,
+    score: 20,
+    hint: "Used in construction.",
+  },
+  {
+    level: "Hard",
+    money: "₹24,00,000",
+    question: "Which process is used to prevent rusting?",
+    options: ["Electrolysis", "Galvanisation", "Distillation", "Evaporation"],
+    correctIndex: 1,
+    score: 20,
+    hint: "Zinc coating on iron.",
+  },
+  {
+    level: "Hard",
+    money: "₹25,00,000",
+    question: "Which of the following is the most reactive metal?",
+    options: ["Iron", "Zinc", "Potassium", "Copper"],
+    correctIndex: 2,
+    score: 20,
+    hint: "Placed at the top of reactivity series.",
+  },
+  // --- Short Answer Practice (examples) ---
+  {
+    level: "Short Answer",
+    money: "Practice",
+    type: "short",
+    question: "Name the gas released when zinc reacts with dilute hydrochloric acid.",
+    acceptableAnswers: ["hydrogen", "hydrogen gas", "h2"],
+    score: 10,
+    hint: "It burns with a pop sound.",
+  },
+  {
+    level: "Short Answer",
+    money: "Practice",
+    type: "short",
+    question: "What is the pH of a neutral solution at 25°C?",
+    acceptableAnswers: ["7", "ph 7", "seven"],
+    score: 10,
+    hint: "It lies at the centre of the pH scale.",
+  },
+  {
+    level: "Short Answer",
+    money: "Practice",
+    type: "short",
+    question: "Write the IUPAC name of CH₃–CH₂–OH.",
+    acceptableAnswers: ["ethanol"],
+    score: 10,
+    hint: "It is a common alcohol used in spirits.",
+  },
+  {
+    level: "Short Answer",
+    money: "Practice",
+    type: "short",
+    question: "Which property of metals allows them to be beaten into thin sheets?",
+    acceptableAnswers: ["malleability", "it is malleable"],
+    score: 10,
+    hint: "Aluminium foil is an example.",
+  },
+  {
+    level: "Short Answer",
+    money: "Practice",
+    type: "short",
+    question: "Name the acid present in vinegar.",
+    acceptableAnswers: ["acetic acid", "ethanoic acid"],
+    score: 10,
+    hint: "Also called ethanoic acid.",
+  },
+];
+
+const MAX_LIVES = 3;
+
+const ChemistryKBCGame = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(MAX_LIVES);
+  const [message, setMessage] = useState("");
+  const [locked, setLocked] = useState(false);
+  const [usedHint, setUsedHint] = useState(false);
+  const [usedSkip, setUsedSkip] = useState(false);
+  const [usedDouble, setUsedDouble] = useState(false);
+  const [doubleActive, setDoubleActive] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [shortAnswer, setShortAnswer] = useState("");
+  const [showCorrectText, setShowCorrectText] = useState(false);
+
+  const question = QUESTIONS[currentIndex];
+
+  const resetGame = () => {
+    setCurrentIndex(0);
+    setScore(0);
+    setLives(MAX_LIVES);
+    setMessage("");
+    setLocked(false);
+    setUsedHint(false);
+    setUsedSkip(false);
+    setUsedDouble(false);
+    setDoubleActive(false);
+    setShowSummary(false);
+    setSelectedIndex(null);
+    setShortAnswer("");
+    setShowCorrectText(false);
+  };
+
+  const handleAnswer = (index) => {
+    setSelectedIndex(index);
+    if (locked || showSummary) return;
+
+    const isCorrect = index === question.correctIndex;
+    setLocked(true);
+
+    if (isCorrect) {
+      const gained = doubleActive ? question.score * 2 : question.score;
+      setScore((prev) => prev + gained);
+      setMessage(`Correct! You earned ${gained} points.`);
+      setDoubleActive(false);
+    } else {
+      setLives((prev) => prev - 1);
+      setMessage("Oops! That's incorrect.");
+      setDoubleActive(false);
     }
 
-    /* Summary / Certificate */
-    .summary {
-      padding-top: 6px;
+    setTimeout(() => {
+      setShowCorrectText(false);
+      const nextLives = isCorrect ? lives : lives - 1;
+      const isLastQuestion = currentIndex === QUESTIONS.length - 1;
+
+      if (nextLives <= 0 || isLastQuestion) {
+        setShowSummary(true);
+      } else {
+        setCurrentIndex((prev) => prev + 1);
+        setSelectedIndex(null);
+        setShortAnswer("");
+        setMessage("");
+        setLocked(false);
+      }
+    }, 1200);
+  };
+
+  const handleShortAnswer = () => {
+    if (locked || showSummary) return;
+    if (!shortAnswer.trim()) {
+      setMessage("Please type an answer before submitting.");
+      return;
     }
-    .cert-card {
-      background: #0b1120;
-      border-radius: 16px;
-      border: 1px solid #4b5563;
-      padding: 14px;
-      margin-bottom: 10px;
-      text-align: center;
+
+    const normalized = shortAnswer.trim().toLowerCase();
+    const acceptable = (question.acceptableAnswers || []).map((a) => a.toLowerCase());
+    const isCorrect = acceptable.some(
+      (ans) => normalized === ans || normalized.includes(ans)
+    );
+
+    setLocked(true);
+    setShowCorrectText(!isCorrect);
+
+    if (isCorrect) {
+      const gained = doubleActive ? question.score * 2 : question.score;
+      setScore((prev) => prev + gained);
+      setMessage(`Correct! You earned ${gained} points.`);
+      setDoubleActive(false);
+    } else {
+      setLives((prev) => prev - 1);
+      const correctText = acceptable[0] || "Check your textbook solution.";
+      setMessage(`Not correct. Example correct answer: "${correctText}"`);
+      setDoubleActive(false);
     }
-    .cert-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-      color: #fbbf24;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .cert-name {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 4px 0;
-      color: #e5e7eb;
-    }
-    .cert-line {
-      font-size: 0.85rem;
-      color: #d1d5db;
-      margin: 2px 0;
-    }
-    .leaderboard {
-      margin-top: 8px;
-    }
-    .leaderboard-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #a5b4fc;
-    }
-    .leaderboard-list {
-      list-style: none;
-      font-size: 0.8rem;
-    }
-    .leaderboard-list li {
-      padding: 4px 6px;
-      border-radius: 8px;
-      background: #020617;
-      border: 1px solid #1f2937;
-      margin-bottom: 3px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .play-again-btn {
-      margin-top: 8px;
-      width: 100%;
-      border-radius: 999px;
-      border: none;
-      background: #34d399;
-      color: #022c22;
-      padding: 10px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    .play-again-btn:hover {
-      background: #6ee7b7;
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <div class="header">
-      <div>
-        <div class="title">
-          Kaun Banega <span>Chemistry Champion</span>
+
+    setTimeout(() => {
+      const nextLives = isCorrect ? lives : lives - 1;
+      const isLastQuestion = currentIndex === QUESTIONS.length - 1;
+
+      if (nextLives <= 0 || isLastQuestion) {
+        setShowSummary(true);
+      } else {
+        setCurrentIndex((prev) => prev + 1);
+        setSelectedIndex(null);
+        setShortAnswer("");
+        setShowCorrectText(false);
+        setMessage("");
+        setLocked(false);
+      }
+    }, 1600);
+  };
+
+  const handleHint = () => {
+    if (usedHint || locked || showSummary) return;
+    setUsedHint(true);
+    setMessage(question.hint || "Think carefully about the concept.");
+                                                                                                                                                };
+
+  const handleSkip = () => {
+    if (usedSkip || locked || showSummary) return;
+    setUsedSkip(true);
+    setMessage("Question skipped. No points gained or lost.");
+    setLocked(true);
+
+    setTimeout(() => {
+      const isLastQuestion = currentIndex === QUESTIONS.length - 1;
+      if (isLastQuestion) {
+        setShowSummary(true);
+      } else {
+        setCurrentIndex((prev) => prev + 1);
+        setShortAnswer("");
+        setMessage("");
+        setLocked(false);
+      }
+    }, 800);
+  };
+
+  const handleDouble = () => {
+    if (usedDouble || locked || showSummary) return;
+    setUsedDouble(true);
+    setDoubleActive(true);
+    setMessage("Double points activated for this question!");
+  };
+
+  const getTitle = () => {
+    if (score >= 120) return "Chemistry Grandmaster";
+    if (score >= 80) return "Chemistry Champion";
+    if (score >= 50) return "Rising Scientist";
+    return "Needs More Practice";
+  };
+
+  const progressPercent = ((currentIndex) / QUESTIONS.length) * 100;
+
+  return (
+    <div className="min-h-screen w-full bg-slate-900 text-slate-50 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-3xl bg-slate-800 rounded-3xl shadow-2xl p-6 sm:p-8 border border-slate-700">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Kaun Banega <span className="text-emerald-400">Chemistry Champion</span>
+            </h1>
+            <p className="text-sm text-slate-300 mt-1">
+              CBSE Class 10 | KBC-style quiz game for your revision.
+            </p>
+          </div>
+          <div className="flex flex-col items-end text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-300">Score:</span>
+              <span className="text-lg font-semibold text-emerald-400">{score}</span>
+            </div>
+            <div className="flex items-center gap-1 mt-1">
+              <span className="text-slate-300">Lives:</span>
+              {Array.from({ length: MAX_LIVES }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-3 w-3 rounded-full ${
+                    i < lives ? "bg-rose-400" : "bg-slate-600"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-        <div class="subtitle">CBSE Class 10 · All chapters · Tap to play</div>
-      </div>
-      <div class="score-box">
-        <div class="score-label">Player</div>
-        <div id="playerNameLabel" class="score-value" style="font-size:0.85rem;"></div>
-        <div class="score-label" style="margin-top:2px;">Score</div>
-        <div id="score" class="score-value">0</div>
-        <div id="timer" class="timer">⏱ 30s</div>
+
+        {/* Progress Bar */}
+        <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-6">
+          <div
+            className="h-full bg-emerald-400 transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        {showSummary ? (
+          <div className="mt-4">
+            <h2 className="text-2xl font-semibold mb-2">Game Over</h2>
+            <p className="text-slate-200 mb-2">Final Score: {score}</p>
+            <p className="text-emerald-300 font-medium mb-4">Title: {getTitle()}</p>
+            <button
+              onClick={resetGame}
+              className="px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm"
+            >
+              Play Again
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Question Card */}
+            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-5 sm:p-6 mb-6">
+              <div className="flex items-center justify-between mb-2 text-xs sm:text-sm text-slate-300">
+                <span>
+                  Q{currentIndex + 1} of {QUESTIONS.length} • {question.level}
+                </span>
+                <span className="font-medium text-amber-300">Prize: {question.money}</span>
+              </div>
+              <p className="text-lg sm:text-xl font-semibold mb-4">
+                {question.question}
+              </p>
+
+              {question.type === "short" ? (
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    className="w-full rounded-xl border border-slate-600 bg-slate-900/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    placeholder="Type your answer here"
+                    value={shortAnswer}
+                    onChange={(e) => setShortAnswer(e.target.value)}
+                    disabled={locked}
+                  />
+                  {showCorrectText && question.acceptableAnswers && (
+                    <p className="text-xs text-slate-300">
+                      Example correct answer: <span className="text-emerald-300">{question.acceptableAnswers[0]}</span>
+                    </p>
+                  )}
+                  <button
+                    onClick={handleShortAnswer}
+                    disabled={locked}
+                    className="inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-xs sm:text-sm font-semibold text-slate-900 hover:bg-emerald-400 disabled:bg-slate-700 disabled:text-slate-300"
+                  >
+                    Submit Answer
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {question.options.map((opt, idx) => {
+                    const isCorrect = idx === question.correctIndex;
+                    const showCorrect = locked && idx === selectedIndex && isCorrect;
+                    const showWrong = locked && idx === selectedIndex && !isCorrect;
+                    return (
+                      <button
+                        key={idx}
+                        disabled={locked}
+                        onClick={() => handleAnswer(idx)}
+                        className={`text-left px-3 py-3 rounded-xl border text-sm sm:text-base transition-all ${
+                          locked
+                            ? showCorrect
+                              ? "bg-emerald-500/90 border-emerald-300 text-slate-900"
+                              : showWrong
+                              ? "bg-rose-500/90 border-rose-300 text-slate-900"
+                              : "bg-slate-800 border-slate-600 text-slate-300"
+                            : "bg-slate-800/70 border-slate-600 hover:border-emerald-400 hover:bg-slate-700"
+                        }`}
+                      >
+                        <span className="font-mono mr-2 text-emerald-300">
+                          {String.fromCharCode(65 + idx)}.
+                        </span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Lifelines / Power-ups */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={handleHint}
+                  disabled={usedHint || locked}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${
+                    usedHint || locked
+                      ? "bg-slate-700 border-slate-600 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-900 border-sky-400 text-sky-300 hover:bg-slate-800"
+                  }`}
+                >
+                  💡 Hint {usedHint && "(used)"}
+                </button>
+                <button
+                  onClick={handleSkip}
+                  disabled={usedSkip || locked}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${
+                    usedSkip || locked
+                      ? "bg-slate-700 border-slate-600 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-900 border-amber-400 text-amber-300 hover:bg-slate-800"
+                  }`}
+                >
+                  ⏭️ Skip {usedSkip && "(used)"}
+                </button>
+                <button
+                  onClick={handleDouble}
+                  disabled={usedDouble || locked || doubleActive}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${
+                    usedDouble || locked || doubleActive
+                      ? "bg-slate-700 border-slate-600 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-900 border-emerald-400 text-emerald-300 hover:bg-slate-800"
+                  }`}
+                >
+                  ✨ Double Points {usedDouble && "(used)"}
+                </button>
+              </div>
+
+              <div className="text-xs sm:text-sm text-slate-300">
+                {message ||
+                  (doubleActive
+                    ? "Double points active! Choose carefully."
+                    : "Choose the correct option or use a lifeline.")}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
+  );
+};
 
-    <div class="progress">
-      <div id="progress-inner" class="progress-inner"></div>
-    </div>
-
-    <div id="content"></div>
-  </div>
-
-  <script>
-    const QUESTION_TIME = 30; // seconds per question
-    const MAX_QUESTIONS = null; // null = use all questions
-
-    // ---------------- QUESTIONS (all 4 chapters) ----------------
-    const questions = [
-      // 1. Chemical Reactions & Equations (5)
-      {
-        q:"Which gas is released when Zinc reacts with Hydrochloric acid?",
-        options:["Oxygen","Carbon dioxide","Hydrogen","Nitrogen"],
-        answer:2
-      },
-      {
-        q:"Which of the following is a displacement reaction?",
-        options:[
-          "CaCO₃ → CaO + CO₂",
-          "Zn + CuSO₄ → ZnSO₄ + Cu",
-          "N₂ + 3H₂ → 2NH₃",
-          "2H₂O → 2H₂ + O₂"
-        ],
-        answer:1
-      },
-      {
-        q:"Rusting of iron is an example of:",
-        options:["Oxidation","Reduction","Neutralisation","Decomposition"],
-        answer:0
-      },
-      {
-        q:"Which of the following is a balanced equation?",
-        options:[
-          "H₂ + O₂ → H₂O",
-          "2H₂ + O₂ → 2H₂O",
-          "H₂ + 2O₂ → H₂O₂",
-          "2H₂O → 2H₂ + O"
-        ],
-        answer:1
-      },
-      {
-        q:"What type of reaction is: 2HgO → 2Hg + O₂?",
-        options:["Combination","Displacement","Decomposition","Neutralisation"],
-        answer:2
-      },
-
-      // 2. Acids, Bases & Salts (10)
-      {
-        q:"Which acid is present in lemon?",
-        options:["Acetic acid","Citric acid","Hydrochloric acid","Sulphuric acid"],
-        answer:1
-      },
-      {
-        q:"Which base is used in making soap?",
-        options:["Calcium hydroxide","Sodium hydroxide","Ammonium hydroxide","Potassium nitrate"],
-        answer:1
-      },
-      {
-        q:"What is the pH value of a neutral solution?",
-        options:["0","7","14","5"],
-        answer:1
-      },
-      {
-        q:"Which gas is produced when an acid reacts with a metal carbonate?",
-        options:["Oxygen","Hydrogen","Carbon dioxide","Nitrogen"],
-        answer:2
-      },
-      {
-        q:"Which salt is called baking soda?",
-        options:["NaCl","NaHCO₃","Na₂CO₃","CaCO₃"],
-        answer:1
-      },
-      {
-        q:"Which acid is present in the stomach?",
-        options:["Sulphuric acid","Nitric acid","Hydrochloric acid","Citric acid"],
-        answer:2
-      },
-      {
-        q:"Tooth decay starts when pH of mouth falls below:",
-        options:["7.0","6.5","5.5","4.5"],
-        answer:2
-      },
-      {
-        q:"Which salt is used to remove hardness of water?",
-        options:["Baking soda","Washing soda","Bleaching powder","Common salt"],
-        answer:1
-      },
-      {
-        q:"Which indicator is naturally obtained from lichens?",
-        options:["Litmus","Methyl orange","Phenolphthalein","Turmeric"],
-        answer:0
-      },
-      {
-        q:"Which substance is used to neutralize acidic soil in farms?",
-        options:["Slaked lime","Baking soda","Vinegar","Bleaching powder"],
-        answer:0
-      },
-
-      // 3. Metals & Non-metals (10)
-      {
-        q:"Which of the following is a non-metal?",
-        options:["Iron","Copper","Sulphur","Aluminium"],
-        answer:2
-      },
-      {
-        q:"Which metal is liquid at room temperature?",
-        options:["Iron","Mercury","Aluminium","Sodium"],
-        answer:1
-      },
-      {
-        q:"Which gas is essential for combustion?",
-        options:["Hydrogen","Carbon dioxide","Oxygen","Nitrogen"],
-        answer:2
-      },
-      {
-        q:"Which metal is used for galvanisation of iron?",
-        options:["Copper","Zinc","Silver","Lead"],
-        answer:1
-      },
-      {
-        q:"Which property of metals allows them to be drawn into wires?",
-        options:["Malleability","Ductility","Conductivity","Sonority"],
-        answer:1
-      },
-      {
-        q:"Which metal is extracted by electrolysis?",
-        options:["Iron","Zinc","Aluminium","Copper"],
-        answer:2
-      },
-      {
-        q:"Which non-metal is the best conductor of electricity?",
-        options:["Sulphur","Carbon (graphite)","Phosphorus","Chlorine"],
-        answer:1
-      },
-      {
-        q:"Which metal is the main constituent of steel?",
-        options:["Aluminium","Copper","Iron","Nickel"],
-        answer:2
-      },
-      {
-        q:"Which process is used to prevent rusting?",
-        options:["Electrolysis","Galvanisation","Distillation","Evaporation"],
-        answer:1
-      },
-      {
-        q:"Which of the following is the most reactive metal?",
-        options:["Iron","Zinc","Potassium","Copper"],
-        answer:2
-      },
-
-      // 4. Carbon and its Compounds (10)
-      {
-        q:"Why does carbon form a large number of compounds?",
-        options:[
-          "It is a metal",
-          "It is highly reactive",
-          "Catenation and tetravalency",
-          "It is radioactive"
-        ],
-        answer:2
-      },
-      {
-        q:"How many covalent bonds are present in methane (CH₄)?",
-        options:["1","2","3","4"],
-        answer:3
-      },
-      {
-        q:"What is the functional group in ethanol (C₂H₅OH)?",
-        options:["–COOH","–OH","–CHO","–Cl"],
-        answer:1
-      },
-      {
-        q:"The IUPAC name of CH₃–CH₂–CH₂–CH₃ is:",
-        options:["Propane","Methane","Butane","Ethane"],
-        answer:2
-      },
-      {
-        q:"Which of the following is a saturated hydrocarbon?",
-        options:["C₂H₂","C₂H₄","C₂H₆","C₆H₆"],
-        answer:2
-      },
-      {
-        q:"Common name of ethanoic acid is:",
-        options:["Formic acid","Acetic acid","Oxalic acid","Citric acid"],
-        answer:1
-      },
-      {
-        q:"Soaps work by forming:",
-        options:["Alloys","Solutions","Micelles","Suspensions"],
-        answer:2
-      },
-      {
-        q:"Which gas is evolved when sodium reacts with ethanol?",
-        options:["Oxygen","Hydrogen","Carbon dioxide","Nitrogen"],
-        answer:1
-      },
-      {
-        q:"Which statement is true for covalent compounds?",
-        options:[
-          "They have high melting points",
-          "They conduct electricity",
-          "They are usually insoluble in water",
-          "They are ionic in nature"
-        ],
-        answer:2
-      },
-      {
-        q:"Homologous series is a group of organic compounds which have:",
-        options:[
-          "Same physical state only",
-          "Different functional groups",
-          "Same functional group and differ by CH₂ unit",
-          "Same number of carbon atoms"
-        ],
-        answer:2
-      }
-    ];
-
-    // ---------------- STATE ----------------
-    const totalQuestions = MAX_QUESTIONS && MAX_QUESTIONS < questions.length
-      ? MAX_QUESTIONS
-      : questions.length;
-
-    let current = 0;
-    let score = 0;
-    let timeLeft = QUESTION_TIME;
-    let timerId = null;
-    let locked = false;
-    let playerName = "";
-
-    // ---------------- DOM ----------------
-    const contentEl = document.getElementById("content");
-    const scoreEl = document.getElementById("score");
-    const timerEl = document.getElementById("timer");
-    const progressInner = document.getElementById("progress-inner");
-    const playerNameLabel = document.getElementById("playerNameLabel");
-
-    // ---------------- SOUND ----------------
-    let audioContext = null;
-    function initAudio() {
-      if (!audioContext) {
-        try {
-          audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) {
-          audioContext = null;
-        }
-      }
-    }
-    function playBeep(frequency, duration) {
-      if (!audioContext) return;
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      osc.type = "sine";
-      osc.frequency.value = frequency;
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-      const now = audioContext.currentTime;
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration / 1000);
-      osc.start(now);
-      osc.stop(now + duration / 1000);
-    }
-    function playCorrectSound() {
-      playBeep(800, 150);
-      setTimeout(() => playBeep(1000, 150), 160);
-    }
-    function playWrongSound() {
-      playBeep(200, 200);
-    }
-    function playTimeUpSound() {
-      playBeep(500, 150);
-    }
-
-    // ---------------- HELPERS ----------------
-    function getTitleFromScore(finalScore) {
-      if (finalScore >= 220) return "Chemistry Grandmaster";
-      if (finalScore >= 160) return "Chemistry Champion";
-      if (finalScore >= 100) return "Rising Scientist";
-      return "Needs More Practice";
-    }
-
-    function updateProgress() {
-      const percent = (current / totalQuestions) * 100;
-      progressInner.style.width = percent + "%";
-    }
-
-    function startTimer() {
-      clearInterval(timerId);
-      timeLeft = QUESTION_TIME;
-      timerEl.textContent = "⏱ " + timeLeft + "s";
-      timerId = setInterval(() => {
-        if (timeLeft <= 1) {
-          clearInterval(timerId);
-          timeLeft = 0;
-          timerEl.textContent = "⏱ 0s";
-          handleTimeUp();
-        } else {
-          timeLeft -= 1;
-          timerEl.textContent = "⏱ " + timeLeft + "s";
-        }
-      }, 1000);
-    }
-
-    function handleTimeUp() {
-      if (locked) return;
-      locked = true;
-      playTimeUpSound();
-
-      const message = document.querySelector(".message");
-      if (message) {
-        message.textContent = "⏰ Time up! Moving to next question.";
-      }
-
-      const btns = contentEl.querySelectorAll(".option-btn");
-      const q = questions[current];
-      btns.forEach((btn, i) => {
-        if (i === q.answer) {
-          btn.classList.add("correct");
-        }
-        btn.classList.add("disabled");
-      });
-
-      setTimeout(() => {
-        nextQuestionOrEnd();
-      }, 1200);
-    }
-
-    function nextQuestionOrEnd() {
-      current++;
-      if (current >= totalQuestions) {
-        endGame();
-      } else {
-        updateProgress();
-        renderQuestion();
-      }
-    }
-
-    // ---------------- LEADERBOARD ----------------
-    function saveScoreToLeaderboard(name, score) {
-      const key = "chemistry_leaderboard_v1";
-      const today = new Date().toISOString().slice(0, 10);
-
-      let data = [];
-      try {
-        const stored = localStorage.getItem(key);
-        if (stored) data = JSON.parse(stored);
-      } catch (e) {
-        data = [];
-      }
-
-      data.push({ name, score, date: today });
-
-      const todaysScores = data.filter((item) => item.date === today);
-      todaysScores.sort((a, b) => b.score - a.score);
-      const top5 = todaysScores.slice(0, 5);
-
-      const older = data.filter((item) => item.date !== today);
-      const finalData = older.concat(top5);
-
-      localStorage.setItem(key, JSON.stringify(finalData));
-      return top5;
-    }
-
-    // ---------------- RENDERING ----------------
-    function renderQuestion() {
-      locked = false;
-      clearInterval(timerId);
-
-      const q = questions[current];
-      updateProgress();
-      startTimer();
-
-      contentEl.innerHTML = "";
-
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const meta = document.createElement("div");
-      meta.className = "meta-row";
-      meta.innerHTML =
-        "<span>Q" + (current + 1) + " of " + totalQuestions + "</span>" +
-        "<span class='prize'>Practice Question</span>";
-      card.appendChild(meta);
-
-      const qText = document.createElement("div");
-      qText.className = "question-text";
-      qText.textContent = q.q;
-      card.appendChild(qText);
-
-      const optionsBox = document.createElement("div");
-      optionsBox.className = "options";
-
-      q.options.forEach((opt, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.innerHTML =
-          "<span class='label'>" +
-          String.fromCharCode(65 + idx) +
-          ".</span><span>" +
-          opt +
-          "</span>";
-        btn.onclick = () => handleAnswer(idx);
-        optionsBox.appendChild(btn);
-      });
-
-      card.appendChild(optionsBox);
-      contentEl.appendChild(card);
-
-      const footerRow = document.createElement("div");
-      footerRow.className = "footer-row";
-
-      const message = document.createElement("div");
-      message.className = "message";
-      message.textContent = "Tap the correct option before the time runs out.";
-      footerRow.appendChild(message);
-
-      contentEl.appendChild(footerRow);
-    }
-
-    function handleAnswer(selectedIndex) {
-      if (locked) return;
-      locked = true;
-      clearInterval(timerId);
-
-      const q = questions[current];
-      const correctIndex = q.answer;
-
-      const btns = contentEl.querySelectorAll(".option-btn");
-      btns.forEach((btn, i) => {
-        btn.classList.add("disabled");
-        if (i === selectedIndex && i === correctIndex) {
-          btn.classList.add("correct");
-        } else if (i === selectedIndex && i !== correctIndex) {
-          btn.classList.add("wrong");
-        } else if (i === correctIndex && selectedIndex !== correctIndex) {
-          btn.classList.add("correct");
-        }
-      });
-
-      const message = document.querySelector(".message");
-
-      if (selectedIndex === correctIndex) {
-        score += 10;
-        scoreEl.textContent = score;
-        if (message) {
-          message.textContent = "✅ Correct! +10 points.";
-          message.classList.add("highlight");
-        }
-        playCorrectSound();
-      } else {
-        if (message) {
-          message.textContent = "❌ Incorrect. Watch the correct answer.";
-          message.classList.remove("highlight");
-        }
-        playWrongSound();
-      }
-
-      setTimeout(() => {
-        nextQuestionOrEnd();
-      }, 1000);
-    }
-
-    function endGame() {
-      clearInterval(timerId);
-      updateProgress();
-      contentEl.innerHTML = "";
-      timerEl.textContent = "⏱ 0s";
-
-      const title = getTitleFromScore(score);
-      const today = new Date().toLocaleDateString("en-IN");
-
-      const summary = document.createElement("div");
-      summary.className = "summary";
-
-      const cert = document.createElement("div");
-      cert.className = "cert-card";
-
-      const certTitle = document.createElement("div");
-      certTitle.className = "cert-title";
-      certTitle.textContent = "Certificate of Achievement";
-      cert.appendChild(certTitle);
-
-      const line1 = document.createElement("div");
-      line1.className = "cert-line";
-      line1.textContent = "This certifies that";
-      cert.appendChild(line1);
-
-      const nameLine = document.createElement("div");
-      nameLine.className = "cert-name";
-      nameLine.textContent = playerName || "Chemistry Player";
-      cert.appendChild(nameLine);
-
-      const line2 = document.createElement("div");
-      line2.className = "cert-line";
-      line2.textContent =
-        "has completed the Chemistry Champion quiz with a score of " +
-        score +
-        " points.";
-      cert.appendChild(line2);
-
-      const line3 = document.createElement("div");
-      line3.className = "cert-line";
-      line3.textContent = "Title earned: " + title;
-      cert.appendChild(line3);
-
-      const line4 = document.createElement("div");
-      line4.className = "cert-line";
-      line4.textContent = "Date: " + today;
-      cert.appendChild(line4);
-
-      summary.appendChild(cert);
-
-      const top5 = saveScoreToLeaderboard(playerName || "Player", score);
-      const board = document.createElement("div");
-      board.className = "leaderboard";
-
-      const boardTitle = document.createElement("div");
-      boardTitle.className = "leaderboard-title";
-      boardTitle.textContent = "🏅 Today's Top Scores";
-      board.appendChild(boardTitle);
-
-      const list = document.createElement("ul");
-      list.className = "leaderboard-list";
-
-      if (top5.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "No scores yet. Be the first!";
-        list.appendChild(li);
-      } else {
-        top5.forEach((entry, index) => {
-          const li = document.createElement("li");
-          li.innerHTML =
-            "<span>" +
-            (index + 1) +
-            ". " +
-            entry.name +
-            "</span><span>" +
-            entry.score +
-            " pts</span>";
-          list.appendChild(li);
-        });
-      }
-
-      board.appendChild(list);
-      summary.appendChild(board);
-
-      const btn = document.createElement("button");
-      btn.className = "play-again-btn";
-      btn.textContent = "Play Again";
-      btn.onclick = () => {
-        score = 0;
-        scoreEl.textContent = score;
-        current = 0;
-        updateProgress();
-        renderQuestion();
-      };
-      summary.appendChild(btn);
-
-      contentEl.appendChild(summary);
-    }
-
-    // ---------------- INIT ----------------
-    (function init() {
-      playerName = prompt("Enter player name (optional):") || "Player";
-      playerNameLabel.textContent = playerName;
-      initAudio();
-      scoreEl.textContent = score;
-      updateProgress();
-      renderQuestion();
-    })();
-  </script>
-</body>
-</html>
+export default ChemistryKBCGame;
