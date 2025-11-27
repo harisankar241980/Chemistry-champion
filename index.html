@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Chemistry Champion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin:0;
+      padding:0;
+      background:#020617;
+      color:#e5e7eb;
+      font-family: Arial, sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+    }
+    .app {
+      width:95%;
+      max-width:480px;
+      background:#020617;
+      border:1px solid #1f2937;
+      border-radius:20px;
+      padding:16px;
+    }
+    h1 {
+      font-size:20px;
+      text-align:center;
+      margin-bottom:8px;
+    }
+    h1 span { color: #34d399; }
+    .score { text-align:center; margin-bottom:10px; }
+    .progress {
+      background:#1f2937;
+      height:6px;
+      border-radius:999px;
+      overflow:hidden;
+      margin:8px 0 12px;
+    }
+    .progress div {
+      background:#34d399;
+      height:100%;
+      width:0%;
+    }
+    .card {
+      background:#0f172a;
+      border-radius:12px;
+      padding:12px;
+      margin-bottom:10px;
+      border:1px solid #1f2937;
+    }
+    .options {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:10px;
+    }
+    button {
+      background:#020617;
+      color:white;
+      border:1px solid #1f2937;
+      padding:10px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+    button:hover { border-color:#34d399; }
+    button.correct { background:#34d399; color:#022c22; }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <h1>Kaun Banega <span>Chemistry Champion</span></h1>
+    <div class="score">Score: <span id="score">0</span></div>
+
+    <div class="progress">
+      <div id="progress"></div>
+    </div>
+
+    <div class="card" id="questionBox"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q:"Which gas is released when Zinc reacts with Hydrochloric acid?",
+        options:["Oxygen","Carbon dioxide","Hydrogen","Nitrogen"],
+        answer:2
+      },
+      {
+        q:"Which of the following is a base?",
+        options:["HCl","H₂SO₄","NaOH","CO₂"],
+        answer:2
+      },
+      {
+        q:"Burning of a candle is an example of which reaction?",
+        options:["Endothermic","Exothermic","Displacement","Photochemical"],
+        answer:1
+      },
+      {
+        q:"Which metal is stored in kerosene?",
+        options:["Iron","Sodium","Copper","Aluminium"],
+        answer:1
+      },
+      {
+        q:"What is corrosion?",
+        options:["Shining of metal",
+                 "Damage by air & water",
+                 "Making bases",
+                 "Reaction with acid only"],
+        answer:1
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    const questionBox = document.getElementById("questionBox");
+    const scoreBox = document.getElementById("score");
+    const progress = document.getElementById("progress");
+
+    function loadQuestion(){
+      const item = questions[current];
+      progress.style.width = (current/questions.length)*100 + "%";
+
+      let html = "<b>Question " + (current+1) + "</b><br><br>";
+      html += item.q + "<div class='options'>";
+
+      item.options.forEach((opt,i)=>{
+        html += `<button onclick='check(${i})'>${String.fromCharCode(65+i)}. ${opt}</button>`;
+      });
+
+      html += "</div>";
+      questionBox.innerHTML = html;
+    }
+
+    function check(i){
+      if(i === questions[current].answer){
+        score += 10;
+        scoreBox.innerText = score;
+      }
+
+      current++;
+
+      if(current < questions.length){
+        loadQuestion();
+      } else {
+        progress.style.width = "100%";
+        questionBox.innerHTML = `
+          <h2>Game Over 🎉</h2>
+          <p>Your Score: <b>${score}</b></p>
+          <button onclick='location.reload()'>Play Again</button>
+        `;
+      }
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
