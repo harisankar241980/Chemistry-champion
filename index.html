@@ -247,7 +247,7 @@
         <div class="title">
           Kaun Banega <span>Chemistry Champion</span>
         </div>
-        <div class="subtitle">CBSE Class 10 · KBC-style quiz · Tap to play</div>
+        <div class="subtitle">CBSE Class 10 · All chapters · Tap to play</div>
       </div>
       <div class="score-box">
         <div class="score-label">Player</div>
@@ -266,45 +266,49 @@
   </div>
 
   <script>
-    // ---------------- CONFIG ----------------
     const QUESTION_TIME = 30; // seconds per question
-    const MAX_QUESTIONS = null; // use null for all questions, or a number like 15
+    const MAX_QUESTIONS = null; // null = use all questions
 
-    // ---------------- QUESTIONS ----------------
+    // ---------------- QUESTIONS (all 4 chapters) ----------------
     const questions = [
-      // --- Chemical Reactions & Basics (original 5) ---
+      // 1. Chemical Reactions & Equations (5)
       {
         q:"Which gas is released when Zinc reacts with Hydrochloric acid?",
         options:["Oxygen","Carbon dioxide","Hydrogen","Nitrogen"],
         answer:2
       },
       {
-        q:"Which of the following is a base?",
-        options:["HCl","H₂SO₄","NaOH","CO₂"],
-        answer:2
-      },
-      {
-        q:"Burning of a candle is an example of which reaction?",
-        options:["Endothermic","Exothermic","Displacement","Photochemical"],
-        answer:1
-      },
-      {
-        q:"Which metal is stored in kerosene?",
-        options:["Iron","Sodium","Copper","Aluminium"],
-        answer:1
-      },
-      {
-        q:"What is corrosion?",
+        q:"Which of the following is a displacement reaction?",
         options:[
-          "Shining of metal",
-          "Damage by air & water",
-          "Making bases",
-          "Reaction with acid only"
+          "CaCO₃ → CaO + CO₂",
+          "Zn + CuSO₄ → ZnSO₄ + Cu",
+          "N₂ + 3H₂ → 2NH₃",
+          "2H₂O → 2H₂ + O₂"
         ],
         answer:1
       },
+      {
+        q:"Rusting of iron is an example of:",
+        options:["Oxidation","Reduction","Neutralisation","Decomposition"],
+        answer:0
+      },
+      {
+        q:"Which of the following is a balanced equation?",
+        options:[
+          "H₂ + O₂ → H₂O",
+          "2H₂ + O₂ → 2H₂O",
+          "H₂ + 2O₂ → H₂O₂",
+          "2H₂O → 2H₂ + O"
+        ],
+        answer:1
+      },
+      {
+        q:"What type of reaction is: 2HgO → 2Hg + O₂?",
+        options:["Combination","Displacement","Decomposition","Neutralisation"],
+        answer:2
+      },
 
-      // --- Acids, Bases & Salts (10 questions) ---
+      // 2. Acids, Bases & Salts (10)
       {
         q:"Which acid is present in lemon?",
         options:["Acetic acid","Citric acid","Hydrochloric acid","Sulphuric acid"],
@@ -356,7 +360,7 @@
         answer:0
       },
 
-      // --- Metals & Non-metals (10 questions) ---
+      // 3. Metals & Non-metals (10)
       {
         q:"Which of the following is a non-metal?",
         options:["Iron","Copper","Sulphur","Aluminium"],
@@ -406,19 +410,87 @@
         q:"Which of the following is the most reactive metal?",
         options:["Iron","Zinc","Potassium","Copper"],
         answer:2
+      },
+
+      // 4. Carbon and its Compounds (10)
+      {
+        q:"Why does carbon form a large number of compounds?",
+        options:[
+          "It is a metal",
+          "It is highly reactive",
+          "Catenation and tetravalency",
+          "It is radioactive"
+        ],
+        answer:2
+      },
+      {
+        q:"How many covalent bonds are present in methane (CH₄)?",
+        options:["1","2","3","4"],
+        answer:3
+      },
+      {
+        q:"What is the functional group in ethanol (C₂H₅OH)?",
+        options:["–COOH","–OH","–CHO","–Cl"],
+        answer:1
+      },
+      {
+        q:"The IUPAC name of CH₃–CH₂–CH₂–CH₃ is:",
+        options:["Propane","Methane","Butane","Ethane"],
+        answer:2
+      },
+      {
+        q:"Which of the following is a saturated hydrocarbon?",
+        options:["C₂H₂","C₂H₄","C₂H₆","C₆H₆"],
+        answer:2
+      },
+      {
+        q:"Common name of ethanoic acid is:",
+        options:["Formic acid","Acetic acid","Oxalic acid","Citric acid"],
+        answer:1
+      },
+      {
+        q:"Soaps work by forming:",
+        options:["Alloys","Solutions","Micelles","Suspensions"],
+        answer:2
+      },
+      {
+        q:"Which gas is evolved when sodium reacts with ethanol?",
+        options:["Oxygen","Hydrogen","Carbon dioxide","Nitrogen"],
+        answer:1
+      },
+      {
+        q:"Which statement is true for covalent compounds?",
+        options:[
+          "They have high melting points",
+          "They conduct electricity",
+          "They are usually insoluble in water",
+          "They are ionic in nature"
+        ],
+        answer:2
+      },
+      {
+        q:"Homologous series is a group of organic compounds which have:",
+        options:[
+          "Same physical state only",
+          "Different functional groups",
+          "Same functional group and differ by CH₂ unit",
+          "Same number of carbon atoms"
+        ],
+        answer:2
       }
     ];
 
     // ---------------- STATE ----------------
+    const totalQuestions = MAX_QUESTIONS && MAX_QUESTIONS < questions.length
+      ? MAX_QUESTIONS
+      : questions.length;
+
     let current = 0;
     let score = 0;
     let timeLeft = QUESTION_TIME;
     let timerId = null;
     let locked = false;
     let playerName = "";
-    const totalQuestions = MAX_QUESTIONS && MAX_QUESTIONS < questions.length
-      ? MAX_QUESTIONS
-      : questions.length;
 
     // ---------------- DOM ----------------
     const contentEl = document.getElementById("content");
@@ -427,7 +499,7 @@
     const progressInner = document.getElementById("progress-inner");
     const playerNameLabel = document.getElementById("playerNameLabel");
 
-    // ---------------- SOUND (Web Audio API) ----------------
+    // ---------------- SOUND ----------------
     let audioContext = null;
     function initAudio() {
       if (!audioContext) {
@@ -463,11 +535,11 @@
       playBeep(500, 150);
     }
 
-    // ---------------- HELPER FUNCTIONS ----------------
+    // ---------------- HELPERS ----------------
     function getTitleFromScore(finalScore) {
-      if (finalScore >= 180) return "Chemistry Grandmaster";
-      if (finalScore >= 120) return "Chemistry Champion";
-      if (finalScore >= 80) return "Rising Scientist";
+      if (finalScore >= 220) return "Chemistry Grandmaster";
+      if (finalScore >= 160) return "Chemistry Champion";
+      if (finalScore >= 100) return "Rising Scientist";
       return "Needs More Practice";
     }
 
@@ -503,7 +575,6 @@
         message.textContent = "⏰ Time up! Moving to next question.";
       }
 
-      // Show correct answer briefly
       const btns = contentEl.querySelectorAll(".option-btn");
       const q = questions[current];
       btns.forEach((btn, i) => {
@@ -531,7 +602,7 @@
     // ---------------- LEADERBOARD ----------------
     function saveScoreToLeaderboard(name, score) {
       const key = "chemistry_leaderboard_v1";
-      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const today = new Date().toISOString().slice(0, 10);
 
       let data = [];
       try {
@@ -543,12 +614,10 @@
 
       data.push({ name, score, date: today });
 
-      // Filter today's scores only (daily challenge)
       const todaysScores = data.filter((item) => item.date === today);
       todaysScores.sort((a, b) => b.score - a.score);
       const top5 = todaysScores.slice(0, 5);
 
-      // Keep older data also, but replace today's with sorted/top5
       const older = data.filter((item) => item.date !== today);
       const finalData = older.concat(top5);
 
@@ -574,7 +643,7 @@
       meta.className = "meta-row";
       meta.innerHTML =
         "<span>Q" + (current + 1) + " of " + totalQuestions + "</span>" +
-        "<span class='prize'>Prize: Practice Question</span>";
+        "<span class='prize'>Practice Question</span>";
       card.appendChild(meta);
 
       const qText = document.createElement("div");
@@ -627,11 +696,8 @@
           btn.classList.add("correct");
         } else if (i === selectedIndex && i !== correctIndex) {
           btn.classList.add("wrong");
-        } else if (i === correctIndex) {
-          // highlight correct answer lightly if user got it wrong
-          if (selectedIndex !== correctIndex) {
-            btn.classList.add("correct");
-          }
+        } else if (i === correctIndex && selectedIndex !== correctIndex) {
+          btn.classList.add("correct");
         }
       });
 
@@ -708,7 +774,6 @@
 
       summary.appendChild(cert);
 
-      // Leaderboard
       const top5 = saveScoreToLeaderboard(playerName || "Player", score);
       const board = document.createElement("div");
       board.className = "leaderboard";
