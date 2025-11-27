@@ -1,0 +1,348 @@
+import React, { useState } from "react";
+
+// Simple CBSE Class 10 Chemistry KBC-style quiz game
+// Drop this component into a React app (e.g., App.jsx) and render it.
+
+const QUESTIONS = [
+  {
+    level: "Easy",
+    money: "₹1,000",
+    question: "Which gas is released when Zinc reacts with Hydrochloric acid?",
+    options: ["Oxygen", "Carbon dioxide", "Hydrogen", "Nitrogen"],
+    correctIndex: 2,
+    score: 10,
+    hint: "It is a colourless gas that burns with a pop sound.",
+  },
+  {
+    level: "Easy",
+    money: "₹2,000",
+    question: "Which of the following is a base?",
+    options: ["HCl", "H₂SO₄", "NaOH", "CO₂"],
+    correctIndex: 2,
+    score: 10,
+    hint: "It is a common strong alkali used in soaps.",
+  },
+  {
+    level: "Easy",
+    money: "₹5,000",
+    question: "Burning of a candle is an example of which type of reaction?",
+    options: ["Endothermic", "Exothermic", "Displacement", "Photochemical"],
+    correctIndex: 1,
+    score: 10,
+    hint: "Does it release heat or absorb heat?",
+  },
+  {
+    level: "Medium",
+    money: "₹10,000",
+    question: "The chemical formula of washing soda is:",
+    options: ["NaCl", "Na₂CO₃·10H₂O", "NaHCO₃", "CaCO₃"],
+    correctIndex: 1,
+    score: 15,
+    hint: "It is hydrated sodium carbonate.",
+  },
+  {
+    level: "Medium",
+    money: "₹20,000",
+    question: "Which metal is stored in kerosene?",
+    options: ["Iron", "Sodium", "Copper", "Aluminium"],
+    correctIndex: 1,
+    score: 15,
+    hint: "It is a very soft and highly reactive metal.",
+  },
+  {
+    level: "Medium",
+    money: "₹40,000",
+    question: "Identify the reaction: CaO + H₂O → Ca(OH)₂",
+    options: ["Decomposition", "Displacement", "Combination", "Double displacement"],
+    correctIndex: 2,
+    score: 15,
+    hint: "Two substances combine to form a single product.",
+  },
+  {
+    level: "Medium",
+    money: "₹80,000",
+    question: "What happens to blue litmus paper in an acid?",
+    options: ["Turns red", "Turns green", "No change", "Turns yellow"],
+    correctIndex: 0,
+    score: 15,
+    hint: "Acids turn this colour.",
+  },
+  {
+    level: "Hard",
+    money: "₹1,60,000",
+    question: "What is corrosion?",
+    options: [
+      "Shining of metals",
+      "Damage of metals by air and moisture",
+      "Formation of bases",
+      "Reaction of metal with acid only",
+    ],
+    correctIndex: 1,
+    score: 20,
+    hint: "Think of rusting of iron.",
+  },
+  {
+    level: "Hard",
+    money: "₹3,20,000",
+    question: "On strong heating, CaCO₃ gives:",
+    options: ["Ca + CO₂", "CaO + CO₂", "Ca(OH)₂ + CO₂", "CaO + H₂O"],
+    correctIndex: 1,
+    score: 20,
+    hint: "It decomposes into calcium oxide and a gas.",
+  },
+  {
+    level: "Hard",
+    money: "₹6,40,000",
+    question: "Which is more reactive: Sodium or Calcium?",
+    options: ["Calcium", "Sodium", "Both same", "None"],
+    correctIndex: 1,
+    score: 20,
+    hint: "It is placed above the other in the reactivity series.",
+  },
+];
+
+const MAX_LIVES = 3;
+
+const ChemistryKBCGame = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(MAX_LIVES);
+  const [message, setMessage] = useState("");
+  const [locked, setLocked] = useState(false);
+  const [usedHint, setUsedHint] = useState(false);
+  const [usedSkip, setUsedSkip] = useState(false);
+  const [usedDouble, setUsedDouble] = useState(false);
+  const [doubleActive, setDoubleActive] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+
+  const question = QUESTIONS[currentIndex];
+
+  const resetGame = () => {
+    setCurrentIndex(0);
+    setScore(0);
+    setLives(MAX_LIVES);
+    setMessage("");
+    setLocked(false);
+    setUsedHint(false);
+    setUsedSkip(false);
+    setUsedDouble(false);
+    setDoubleActive(false);
+    setShowSummary(false);
+  };
+
+  const handleAnswer = (index) => {
+    if (locked || showSummary) return;
+
+    const isCorrect = index === question.correctIndex;
+    setLocked(true);
+
+    if (isCorrect) {
+      const gained = doubleActive ? question.score * 2 : question.score;
+      setScore((prev) => prev + gained);
+      setMessage(`Correct! You earned ${gained} points.`);
+      setDoubleActive(false);
+    } else {
+      setLives((prev) => prev - 1);
+      setMessage("Oops! That's incorrect.");
+      setDoubleActive(false);
+    }
+
+    setTimeout(() => {
+      const nextLives = isCorrect ? lives : lives - 1;
+      const isLastQuestion = currentIndex === QUESTIONS.length - 1;
+
+      if (nextLives <= 0 || isLastQuestion) {
+        setShowSummary(true);
+      } else {
+        setCurrentIndex((prev) => prev + 1);
+        setMessage("");
+        setLocked(false);
+      }
+    }, 1200);
+  };
+
+  const handleHint = () => {
+    if (usedHint || locked || showSummary) return;
+    setUsedHint(true);
+    setMessage(question.hint || "Think carefully about the concept.");
+  };
+
+  const handleSkip = () => {
+    if (usedSkip || locked || showSummary) return;
+    setUsedSkip(true);
+    setMessage("Question skipped. No points gained or lost.");
+    setLocked(true);
+
+    setTimeout(() => {
+      const isLastQuestion = currentIndex === QUESTIONS.length - 1;
+      if (isLastQuestion) {
+        setShowSummary(true);
+      } else {
+        setCurrentIndex((prev) => prev + 1);
+        setMessage("");
+        setLocked(false);
+      }
+    }, 800);
+  };
+
+  const handleDouble = () => {
+    if (usedDouble || locked || showSummary) return;
+    setUsedDouble(true);
+    setDoubleActive(true);
+    setMessage("Double points activated for this question!");
+  };
+
+  const getTitle = () => {
+    if (score >= 120) return "Chemistry Grandmaster";
+    if (score >= 80) return "Chemistry Champion";
+    if (score >= 50) return "Rising Scientist";
+    return "Needs More Practice";
+  };
+
+  const progressPercent = ((currentIndex) / QUESTIONS.length) * 100;
+
+  return (
+    <div className="min-h-screen w-full bg-slate-900 text-slate-50 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-3xl bg-slate-800 rounded-3xl shadow-2xl p-6 sm:p-8 border border-slate-700">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Kaun Banega <span className="text-emerald-400">Chemistry Champion</span>
+            </h1>
+            <p className="text-sm text-slate-300 mt-1">
+              CBSE Class 10 | KBC-style quiz game for your revision.
+            </p>
+          </div>
+          <div className="flex flex-col items-end text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-300">Score:</span>
+              <span className="text-lg font-semibold text-emerald-400">{score}</span>
+            </div>
+            <div className="flex items-center gap-1 mt-1">
+              <span className="text-slate-300">Lives:</span>
+              {Array.from({ length: MAX_LIVES }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-3 w-3 rounded-full ${
+                    i < lives ? "bg-rose-400" : "bg-slate-600"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-6">
+          <div
+            className="h-full bg-emerald-400 transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        {showSummary ? (
+          <div className="mt-4">
+            <h2 className="text-2xl font-semibold mb-2">Game Over</h2>
+            <p className="text-slate-200 mb-2">Final Score: {score}</p>
+            <p className="text-emerald-300 font-medium mb-4">Title: {getTitle()}</p>
+            <button
+              onClick={resetGame}
+              className="px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm"
+            >
+              Play Again
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Question Card */}
+            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-5 sm:p-6 mb-6">
+              <div className="flex items-center justify-between mb-2 text-xs sm:text-sm text-slate-300">
+                <span>
+                  Q{currentIndex + 1} of {QUESTIONS.length} • {question.level}
+                </span>
+                <span className="font-medium text-amber-300">Prize: {question.money}</span>
+              </div>
+              <p className="text-lg sm:text-xl font-semibold mb-4">
+                {question.question}
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {question.options.map((opt, idx) => {
+                  const isCorrect = idx === question.correctIndex;
+                  const showCorrect = locked && isCorrect;
+                  return (
+                    <button
+                      key={idx}
+                      disabled={locked}
+                      onClick={() => handleAnswer(idx)}
+                      className={`text-left px-3 py-3 rounded-xl border text-sm sm:text-base transition-all ${
+                        locked
+                          ? showCorrect
+                            ? "bg-emerald-500/90 border-emerald-300 text-slate-900"
+                            : "bg-slate-800 border-slate-600 text-slate-300"
+                          : "bg-slate-800/70 border-slate-600 hover:border-emerald-400 hover:bg-slate-700"
+                      }`}
+                    >
+                      <span className="font-mono mr-2 text-emerald-300">
+                        {String.fromCharCode(65 + idx)}.
+                      </span>
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Lifelines / Power-ups */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={handleHint}
+                  disabled={usedHint || locked}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${
+                    usedHint || locked
+                      ? "bg-slate-700 border-slate-600 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-900 border-sky-400 text-sky-300 hover:bg-slate-800"
+                  }`}
+                >
+                  💡 Hint {usedHint && "(used)"}
+                </button>
+                <button
+                  onClick={handleSkip}
+                  disabled={usedSkip || locked}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${
+                    usedSkip || locked
+                      ? "bg-slate-700 border-slate-600 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-900 border-amber-400 text-amber-300 hover:bg-slate-800"
+                  }`}
+                >
+                  ⏭️ Skip {usedSkip && "(used)"}
+                </button>
+                <button
+                  onClick={handleDouble}
+                  disabled={usedDouble || locked || doubleActive}
+                  className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium border transition ${
+                    usedDouble || locked || doubleActive
+                      ? "bg-slate-700 border-slate-600 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-900 border-emerald-400 text-emerald-300 hover:bg-slate-800"
+                  }`}
+                >
+                  ✨ Double Points {usedDouble && "(used)"}
+                </button>
+              </div>
+
+              <div className="text-xs sm:text-sm text-slate-300">
+                {message ||
+                  (doubleActive
+                    ? "Double points active! Choose carefully."
+                    : "Choose the correct option or use a lifeline.")}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ChemistryKBCGame;
