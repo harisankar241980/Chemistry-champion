@@ -5,7 +5,6 @@
   <title>Chemistry Champion – CBSE 10</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* (Same styling as before, kept concise) */
     *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     body{background:#020617;color:#e5e7eb;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
     .app{width:100%;max-width:520px;background:#020617;border-radius:24px;border:1px solid #1f2937;box-shadow:0 20px 40px rgba(0,0,0,.45);padding:16px 16px 20px}
@@ -14,6 +13,7 @@
     .title span{color:#34d399}
     .subtitle{font-size:.75rem;color:#9ca3af;margin-top:2px}
     .score-box{text-align:right;font-size:.8rem}
+    .score-label{color:#d1d5db}
     .score-value{font-weight:600;color:#34d399;font-size:1rem}
     .timer{margin-top:4px;font-size:.8rem;color:#fbbf24}
     .pill-btn{border-radius:999px;border:1px solid #4b5563;background:#020617;padding:4px 8px;font-size:.7rem;cursor:pointer;color:#e5e7eb;white-space:nowrap}
@@ -23,12 +23,14 @@
     .progress-inner{height:100%;background:#34d399;width:0%;transition:width .3s}
     .card{background:rgba(15,23,42,.95);border-radius:18px;border:1px solid #1f2937;padding:12px;margin-bottom:10px}
     .meta-row{display:flex;justify-content:space-between;font-size:.75rem;color:#9ca3af;margin-bottom:8px}
+    .prize{color:#fbbf24;font-weight:600}
     .chapter-tag{font-size:.7rem;color:#a5b4fc;margin-bottom:4px}
     .question-text{font-size:1rem;font-weight:600;margin-bottom:10px}
     .options{display:grid;grid-template-columns:1fr;gap:8px}
     @media(min-width:420px){.options{grid-template-columns:1fr 1fr}}
     .option-btn{border-radius:14px;border:1px solid #374151;background:rgba(15,23,42,.9);color:#e5e7eb;padding:10px;font-size:.85rem;text-align:left;display:flex;align-items:flex-start;gap:6px;cursor:pointer}
     .option-btn span.label{font-family:monospace;color:#34d399;font-size:.8rem}
+    .option-btn:hover{border-color:#34d399;background:#111827}
     .option-btn.correct{background:#34d399;border-color:#bbf7d0;color:#022c22}
     .option-btn.wrong{background:#fb7185;border-color:#fecaca;color:#111827}
     .option-btn.disabled{cursor:default;opacity:.95}
@@ -36,10 +38,20 @@
     @media(min-width:420px){.footer-row{flex-direction:row;justify-content:space-between;align-items:center}}
     .message{font-size:.75rem;color:#9ca3af}
     .message.highlight{color:#34d399}
+    .summary{padding-top:6px}
+    .cert-card{background:#0b1120;border-radius:16px;border:1px solid #4b5563;padding:14px;margin-bottom:10px;text-align:center}
+    .cert-title{font-size:1.1rem;font-weight:700;margin-bottom:4px;color:#fbbf24;text-transform:uppercase;letter-spacing:.05em}
+    .cert-name{font-size:1rem;font-weight:600;margin:4px 0;color:#e5e7eb}
+    .cert-line{font-size:.85rem;color:#d1d5db;margin:2px 0}
+    .leaderboard{margin-top:8px}
+    .leaderboard-title{font-size:.9rem;font-weight:600;margin-bottom:4px;color:#a5b4fc}
+    .leaderboard-list{list-style:none;font-size:.8rem}
+    .leaderboard-list li{padding:4px 6px;border-radius:8px;background:#020617;border:1px solid #1f2937;margin-bottom:3px;display:flex;justify-content:space-between}
+    .play-again-btn{margin-top:8px;width:100%;border-radius:999px;border:none;background:#34d399;color:#022c22;padding:10px;font-weight:600;font-size:.9rem;cursor:pointer}
     .short-input{width:100%;border-radius:12px;border:1px solid #4b5563;background:#020617;padding:8px 10px;font-size:.85rem;color:#e5e7eb;margin-bottom:6px}
     .short-btn{border-radius:999px;border:none;background:#34d399;color:#022c22;padding:8px 12px;font-size:.8rem;font-weight:600;cursor:pointer;margin-top:4px}
     .correct-text{font-size:.75rem;color:#a5b4fc;margin-top:4px}
-    .play-again-btn{margin-top:8px;width:100%;border-radius:999px;border:none;background:#34d399;color:#022c22;padding:10px;font-weight:600;font-size:.9rem;cursor:pointer}
+    .pill-small{padding:6px 8px;border-radius:12px;border:1px solid #374151;background:#020617;color:#e5e7eb}
   </style>
 </head>
 <body>
@@ -55,7 +67,7 @@
         <div class="score-label" style="margin-top:2px;">Score</div>
         <div id="score" class="score-value">0</div>
         <div id="timer" class="timer">⏱ 30s</div>
-        <div class="mode-toggle">
+        <div style="margin-top:6px">
           <button id="modeAll" class="pill-btn active">All Qns</button>
           <button id="modeShort" class="pill-btn">Short only</button>
         </div>
@@ -76,32 +88,77 @@
   </div>
 
   <script>
-    // --- config + data (same as working version) ---
-    const QUESTION_TIME = 30;
-    let mode = "all";
+    // SETTINGS
+    const QUESTION_TIME = 30; // seconds
+    let mode = "all"; // "all" or "short"
     let currentChapter = "All";
 
+    // FULL QUESTION BANK — expanded, includes extra short questions for Reactions & Metals
     const allQuestions = [
-      // (small set — keep the full bank you already have; shortened here for readability)
-      { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Which gas is released when zinc reacts with dilute hydrochloric acid?", options: ["Oxygen","Carbon dioxide","Hydrogen","Nitrogen"], answer: 2 },
-      { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Rusting of iron is an example of:", options: ["Oxidation","Reduction","Neutralisation","Decomposition"], answer: 0 },
-      { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which acid is present in vinegar?", options: ["Citric acid","Acetic acid","Hydrochloric acid","Sulphuric acid"], answer: 1 },
-      { chapter: "Acids, Bases & Salts", type: "short", q: "Name the acid present in lemon.", acceptableAnswers: ["citric acid"] },
-      { chapter: "Metals & Non-metals", type: "mcq", q: "Which metal is liquid at room temperature?", options: ["Iron","Mercury","Aluminium","Sodium"], answer: 1 },
-      { chapter: "Carbon & Its Compounds", type: "mcq", q: "How many covalent bonds are present in a methane (CH₄) molecule?", options: ["1","2","3","4"], answer: 3 },
-      { chapter: "Carbon & Its Compounds", type: "short", q: "Name the functional group present in ethanol (C₂H₅OH).", acceptableAnswers: ["hydroxyl","oh","–oh"] },
-      // add the rest of your bank here (full list you have)
+      // Chemical Reactions & Equations — MCQ + short
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which gas is released when zinc reacts with dilute hydrochloric acid?", options:["Oxygen","Carbon dioxide","Hydrogen","Nitrogen"], answer:2 },
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which type of reaction is 2HgO → 2Hg + O₂?", options:["Combination","Decomposition","Displacement","Double displacement"], answer:1 },
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which of these is a displacement reaction?", options:["CaCO₃ → CaO + CO₂","Zn + CuSO₄ → ZnSO₄ + Cu","N₂ + 3H₂ → 2NH₃","2H₂O → 2H₂ + O₂"], answer:1 },
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Combustion is an example of which type of reaction?", options:["Oxidation","Reduction","Neutralisation","Precipitation"], answer:0 },
+
+      // SHORT for Reactions (new)
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"Define oxidation in terms of oxygen.", acceptableAnswers:["addition of oxygen","gain of oxygen","addition of oxygen to a substance"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"Write balanced equation for magnesium burning in oxygen.", acceptableAnswers:["2mg + o2 → 2mgo","2 mg + o2 → 2 mgo","2mg+o2→2mgo"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"What is a displacement reaction? Give one example.", acceptableAnswers:["one element replaces another, eg zn + cusO4 → znso4 + cu","zn + cuso4 → znso4 + cu","one element replaces another"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"Give an example of a redox reaction.", acceptableAnswers:["rusting of iron","zn + cuSo4 → znSo4 + cu","combustion of carbon"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"What happens in a combination reaction?", acceptableAnswers:["two or more substances combine to form one","combination of two substances to make one","two substances form one product"] },
+
+      // Acids, Bases & Salts — MCQ + short
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"Which acid is present in vinegar?", options:["Citric acid","Acetic acid","Hydrochloric acid","Sulphuric acid"], answer:1 },
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"What is the pH of a neutral solution at 25°C?", options:["0","7","14","1"], answer:1 },
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"Which salt is called baking soda?", options:["NaCl","NaHCO₃","Na₂CO₃","CaCO₃"], answer:1 },
+      { chapter:"Acids, Bases & Salts", type:"short", q:"Name the acid present in lemon.", acceptableAnswers:["citric acid"] },
+      { chapter:"Acids, Bases & Salts", type:"short", q:"Name the gas that turns lime water milky.", acceptableAnswers:["carbon dioxide","co2","carbon dioxide gas"] },
+
+      // Metals & Non-metals — MCQ
+      { chapter:"Metals & Non-metals", type:"mcq", q:"Which metal is liquid at room temperature?", options:["Iron","Mercury","Aluminium","Sodium"], answer:1 },
+      { chapter:"Metals & Non-metals", type:"mcq", q:"Which property of metals allows them to be drawn into wires?", options:["Malleability","Ductility","Conductivity","Sonority"], answer:1 },
+      { chapter:"Metals & Non-metals", type:"mcq", q:"Which metal is used for galvanisation of iron?", options:["Copper","Zinc","Silver","Lead"], answer:1 },
+      { chapter:"Metals & Non-metals", type:"mcq", q:"Which metal reacts vigorously with water?", options:["Gold","Sodium","Copper","Silver"], answer:1 },
+
+      // SHORT for Metals (new)
+      { chapter:"Metals & Non-metals", type:"short", q:"Which property of metals allows them to be beaten into thin sheets?", acceptableAnswers:["malleability","it is malleable"] },
+      { chapter:"Metals & Non-metals", type:"short", q:"Why is sodium stored in kerosene?", acceptableAnswers:["because it is highly reactive","it reacts vigorously with air and water","it reacts with air and water"] },
+      { chapter:"Metals & Non-metals", type:"short", q:"Why are alloys used instead of pure metals often?", acceptableAnswers:["to improve strength and properties","improve strength","to increase hardness and reduce corrosion"] },
+      { chapter:"Metals & Non-metals", type:"short", q:"Give one economic use of aluminium.", acceptableAnswers:["lightweight for aircraft and utensils","making aircraft parts","making utensils"] },
+      { chapter:"Metals & Non-metals", type:"short", q:"What is corrosion? Give an example.", acceptableAnswers:["damage of metals by air and moisture","rusting of iron","corrosion is rusting"] },
+
+      // Carbon & Its Compounds — MCQ + short
+      { chapter:"Carbon & Its Compounds", type:"mcq", q:"How many covalent bonds are present in methane (CH₄)?", options:["1","2","3","4"], answer:3 },
+      { chapter:"Carbon & Its Compounds", type:"mcq", q:"The IUPAC name of CH₃–CH₂–CH₂–CH₃ is:", options:["Propane","Methane","Butane","Ethane"], answer:2 },
+      { chapter:"Carbon & Its Compounds", type:"mcq", q:"What is the common name of ethanoic acid?", options:["Formic acid","Acetic acid","Oxalic acid","Citric acid"], answer:1 },
+      { chapter:"Carbon & Its Compounds", type:"short", q:"Name the functional group present in ethanol (C₂H₅OH).", acceptableAnswers:["hydroxyl","oh","oh group","–oh"] },
+      { chapter:"Carbon & Its Compounds", type:"short", q:"What is a homologous series?", acceptableAnswers:["series with same functional group and differs by -CH2-","homologous series"] },
+
+      // Extra practice (mixture across chapters) — more coverage
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which reaction type is neutralisation?", options:["Combination","Displacement","Neutralisation","Redox"], answer:2 },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"What is a balanced chemical equation?", acceptableAnswers:["an equation with same number of atoms on both sides","same atoms on both sides"] },
+      { chapter:"Acids, Bases & Salts", type:"short", q:"Which indicator turns pink in a base?", acceptableAnswers:["phenolphthalein"] },
+      { chapter:"Metals & Non-metals", type:"mcq", q:"Which metal is extracted from bauxite?", options:["Iron","Aluminium","Copper","Zinc"], answer:1 },
+      { chapter:"Carbon & Its Compounds", type:"mcq", q:"Which bond is present in ethene (C2H4)?", options:["Single bond","Double bond","Triple bond","Ionic bond"], answer:1 },
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"Tooth decay starts when pH of mouth falls below:", options:["7.0","6.5","5.5","4.5"], answer:2 },
+
+      // Add more short practice items to ensure good coverage (feel free to expand)
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"Give one real-life example of decomposition reaction.", acceptableAnswers:["electrolysis of water","heating of calcium carbonate gives caO + co2","decomposition of hydrogen peroxide"] },
+      { chapter:"Metals & Non-metals", type:"short", q:"State one use of zinc", acceptableAnswers:["galvanisation","used for galvanisation","anti corrosive coating"] },
+      { chapter:"Carbon & Its Compounds", type:"short", q:"What is ethanol used for?", acceptableAnswers:["solvent","fuel","alcohol in spirits"] }
     ];
 
-    // --- state ---
+    // STATE
     let questions = [];
-    let current = 0;
+    let current = 0; // index within filtered questions
     let score = 0;
     let timeLeft = QUESTION_TIME;
     let timerId = null;
     let locked = false;
     let playerName = "";
 
+    // DOM refs
     const contentEl = document.getElementById("content");
     const scoreEl = document.getElementById("score");
     const timerEl = document.getElementById("timer");
@@ -111,58 +168,89 @@
     const modeShortBtn = document.getElementById("modeShort");
     const chapterButtons = document.querySelectorAll(".chapter-toggle .pill-btn");
 
-    // audio helpers
+    // AUDIO
     let audioContext = null;
-    function initAudio(){ try{ audioContext = new (window.AudioContext||window.webkitAudioContext)() }catch(e){ audioContext = null } }
-    function playBeep(freq,dur){ if(!audioContext) return; const o=audioContext.createOscillator(), g=audioContext.createGain(); o.type='sine'; o.frequency.value=freq; o.connect(g); g.connect(audioContext.destination); const now=audioContext.currentTime; g.gain.setValueAtTime(0.15,now); g.gain.exponentialRampToValueAtTime(0.001, now + dur/1000); o.start(now); o.stop(now + dur/1000); }
-    function playCorrectSound(){ playBeep(800,150); setTimeout(()=>playBeep(1000,150),160); }
-    function playWrongSound(){ playBeep(200,200); }
-    function playTimeUpSound(){ playBeep(500,150); }
+    function initAudio() {
+      try { audioContext = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audioContext = null; }
+    }
+    function playBeep(freq, duration) {
+      if (!audioContext) return;
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      const now = audioContext.currentTime;
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration / 1000);
+      osc.start(now);
+      osc.stop(now + duration / 1000);
+    }
+    function playCorrectSound() { playBeep(800,150); setTimeout(()=>playBeep(1000,150),160); }
+    function playWrongSound() { playBeep(200,200); }
+    function playTimeUpSound() { playBeep(500,150); }
 
-    // question filtering
-    function getActiveQuestions(){
+    // helpers
+    function getActiveQuestions() {
       let filtered = allQuestions.slice();
-      if(currentChapter !== "All") filtered = filtered.filter(q => q.chapter === currentChapter);
-      if(mode === "short") filtered = filtered.filter(q => q.type === "short");
+      if (currentChapter !== "All") filtered = filtered.filter(q => q.chapter === currentChapter);
+      if (mode === "short") filtered = filtered.filter(q => q.type === "short");
       return filtered;
     }
 
-    function updateProgress(){
+    function updateProgress() {
       const percent = questions.length ? (current / questions.length) * 100 : 0;
       progressInner.style.width = percent + "%";
     }
 
-    function startTimer(){
+    function startTimer() {
       clearInterval(timerId);
       timeLeft = QUESTION_TIME;
       timerEl.textContent = "⏱ " + timeLeft + "s";
-      timerId = setInterval(()=>{
-        if(timeLeft <= 1){ clearInterval(timerId); timeLeft = 0; timerEl.textContent = "⏱ 0s"; handleTimeUp(); }
-        else { timeLeft -= 1; timerEl.textContent = "⏱ " + timeLeft + "s"; }
-      },1000);
+      timerId = setInterval(() => {
+        if (timeLeft <= 1) {
+          clearInterval(timerId);
+          timeLeft = 0;
+          timerEl.textContent = "⏱ 0s";
+          handleTimeUp();
+        } else {
+          timeLeft -= 1;
+          timerEl.textContent = "⏱ " + timeLeft + "s";
+        }
+      }, 1000);
     }
 
-    function handleTimeUp(){
-      if(locked) return;
+    function handleTimeUp() {
+      if (locked) return;
       locked = true;
       playTimeUpSound();
       const msg = document.querySelector(".message");
-      if(msg) msg.textContent = "⏰ Time up! Moving to next question.";
+      if (msg) msg.textContent = "⏰ Time up! Moving to next question.";
+
       const q = questions[current];
-      if(q.type === "mcq"){
+      if (q.type === "mcq") {
         const btns = contentEl.querySelectorAll(".option-btn");
-        btns.forEach((btn,i)=>{ if(i===q.answer) btn.classList.add("correct"); btn.classList.add("disabled"); });
+        btns.forEach((btn, i) => {
+          if (i === q.answer) btn.classList.add("correct");
+          btn.classList.add("disabled");
+        });
       }
-      setTimeout(()=> nextQuestionOrEnd(), 1400);
+      setTimeout(() => { nextQuestionOrEnd(); }, 1400);
     }
 
-    function nextQuestionOrEnd(){
+    function nextQuestionOrEnd() {
       current++;
-      if(current >= questions.length) endGame(); else { updateProgress(); renderQuestion(); }
+      if (current >= questions.length) {
+        endGame();
+      } else {
+        updateProgress();
+        renderQuestion();
+      }
     }
 
-    function handleOptionClick(i){
-      if(locked) return;
+    function handleOptionClick(i) {
+      if (locked) return;
       locked = true;
       clearInterval(timerId);
 
@@ -173,33 +261,37 @@
 
       btns.forEach((btn, idx) => {
         btn.classList.add("disabled");
-        if(idx === i && idx === correct) btn.classList.add("correct");
-        else if(idx === i && idx !== correct) btn.classList.add("wrong");
-        else if(idx === correct && i !== correct) btn.classList.add("correct");
+        if (idx === i && idx === correct) btn.classList.add("correct");
+        else if (idx === i && idx !== correct) btn.classList.add("wrong");
+        else if (idx === correct && i !== correct) btn.classList.add("correct");
       });
 
-      if(i === correct){
+      if (i === correct) {
         score += 10;
         scoreEl.textContent = score;
-        if(msg){ msg.textContent = "✅ Correct! +10 points."; msg.classList.add("highlight"); }
+        if (msg) { msg.textContent = "✅ Correct! +10 points."; msg.classList.add("highlight"); }
         playCorrectSound();
       } else {
-        if(msg){ msg.textContent = "❌ Incorrect. Watch the correct answer."; msg.classList.remove("highlight"); }
+        if (msg) { msg.textContent = "❌ Incorrect. Watch the correct answer."; msg.classList.remove("highlight"); }
         playWrongSound();
       }
 
-      // <-- longer display when wrong: 3000ms
-      setTimeout(()=> nextQuestionOrEnd(), 2000);
+      // show longer when wrong
+      setTimeout(() => { nextQuestionOrEnd(); }, 3000);
     }
 
-    function handleShortSubmit(){
-      if(locked) return;
+    function handleShortSubmit() {
+      if (locked) return;
       const input = document.getElementById("shortAnswerInput");
-      if(!input) return;
+      if (!input) return;
       const value = input.value.trim();
       const msg = document.querySelector(".message");
       const correctTextEl = document.getElementById("correctText");
-      if(!value){ if(msg) msg.textContent = "Please type an answer before submitting."; return; }
+
+      if (!value) {
+        if (msg) msg.textContent = "Please type an answer before submitting.";
+        return;
+      }
 
       locked = true;
       clearInterval(timerId);
@@ -209,50 +301,54 @@
       const acceptable = (q.acceptableAnswers || []).map(a => a.toLowerCase());
       const isCorrect = acceptable.some(ans => normalized === ans || normalized.includes(ans));
 
-      if(isCorrect){
+      if (isCorrect) {
         score += 10;
         scoreEl.textContent = score;
-        if(msg){ msg.textContent = "✅ Correct! +10 points."; msg.classList.add("highlight"); }
-        if(correctTextEl) correctTextEl.textContent = "";
+        if (msg) { msg.textContent = "✅ Correct! +10 points."; msg.classList.add("highlight"); }
+        if (correctTextEl) correctTextEl.textContent = "";
         playCorrectSound();
       } else {
         const correctExample = (q.acceptableAnswers && q.acceptableAnswers[0]) || "Check your textbook.";
-        if(msg){ msg.textContent = '❌ Not correct. Correct answer (example): "' + correctExample + '".'; msg.classList.remove("highlight"); }
-        if(correctTextEl){ correctTextEl.textContent = 'Example correct answer: "' + correctExample + '"'; }
+        if (msg) { msg.textContent = '❌ Not correct. Correct answer (example): "' + correctExample + '".'; msg.classList.remove("highlight"); }
+        if (correctTextEl) correctTextEl.textContent = 'Example correct answer: "' + correctExample + '"';
         playWrongSound();
       }
 
-      // <-- longer for short answer: 3500ms
-      setTimeout(()=> nextQuestionOrEnd(), 2000);
+      setTimeout(() => { nextQuestionOrEnd(); }, 3500);
     }
 
-    function getTitle(finalScore){
-      if(finalScore >= 120) return "Chemistry Grandmaster";
-      if(finalScore >= 80) return "Chemistry Champion";
-      if(finalScore >= 50) return "Rising Scientist";
+    function getTitle(finalScore) {
+      if (finalScore >= 120) return "Chemistry Grandmaster";
+      if (finalScore >= 80) return "Chemistry Champion";
+      if (finalScore >= 50) return "Rising Scientist";
       return "Needs More Practice";
     }
 
-    function saveScoreToLeaderboard(name, score){
+    function saveScoreToLeaderboard(name, score) {
       const key = "chemistry_leaderboard_v1";
-      const today = new Date().toISOString().slice(0,10);
+      const today = new Date().toISOString().slice(0, 10);
       let data = [];
-      try{ const stored = localStorage.getItem(key); if(stored) data = JSON.parse(stored); }catch(e){ data = []; }
-      data.push({name,score,date:today});
-      const todayScores = data.filter(d => d.date===today);
-      todayScores.sort((a,b)=>b.score - a.score);
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored) data = JSON.parse(stored);
+      } catch (e) { data = []; }
+
+      data.push({ name, score, date: today });
+      const todayScores = data.filter(d => d.date === today);
+      todayScores.sort((a,b) => b.score - a.score);
       const top5 = todayScores.slice(0,5);
-      const older = data.filter(d=>d.date !== today);
+      const older = data.filter(d => d.date !== today);
       const finalData = older.concat(top5);
       localStorage.setItem(key, JSON.stringify(finalData));
       return top5;
     }
 
-    function endGame(){
+    function endGame() {
       clearInterval(timerId);
       updateProgress();
       timerEl.textContent = "⏱ 0s";
       contentEl.innerHTML = "";
+
       const finalScore = score;
       const title = getTitle(finalScore);
       const today = new Date().toLocaleDateString("en-IN");
@@ -271,30 +367,53 @@
       const board = document.createElement("div"); board.className = "leaderboard";
       const boardTitle = document.createElement("div"); boardTitle.className = "leaderboard-title"; boardTitle.textContent = "🏅 Today's Top Scores"; board.appendChild(boardTitle);
       const list = document.createElement("ul"); list.className = "leaderboard-list";
-      if(top5.length === 0){ const li = document.createElement("li"); li.textContent = "No scores yet. Be the first!"; list.appendChild(li); }
-      else { top5.forEach((entry,index)=>{ const li = document.createElement("li"); li.innerHTML = "<span>"+(index+1)+". "+entry.name+"</span><span>"+entry.score+" pts</span>"; list.appendChild(li); }); }
+
+      if (top5.length === 0) {
+        const li = document.createElement("li"); li.textContent = "No scores yet. Be the first!"; list.appendChild(li);
+      } else {
+        top5.forEach((entry, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = "<span>" + (index + 1) + ". " + entry.name + "</span><span>" + entry.score + " pts</span>";
+          list.appendChild(li);
+        });
+      }
+
       board.appendChild(list); summary.appendChild(board);
-      const btn = document.createElement("button"); btn.className = "play-again-btn"; btn.textContent = "Play Again"; btn.onclick = ()=>{ score = 0; scoreEl.textContent = score; questions = getActiveQuestions(); current = 0; updateProgress(); renderQuestion(); }; summary.appendChild(btn);
+
+      const btn = document.createElement("button"); btn.className = "play-again-btn"; btn.textContent = "Play Again";
+      btn.onclick = () => {
+        score = 0; scoreEl.textContent = score; questions = getActiveQuestions(); current = 0; updateProgress(); renderQuestion();
+      };
+      summary.appendChild(btn);
       contentEl.appendChild(summary);
     }
 
-    function renderQuestion(){
-      locked = false; clearInterval(timerId);
-      if(!questions.length){ contentEl.innerHTML = "<p>No questions for this mode/chapter yet.</p>"; timerEl.textContent = "⏱ 0s"; progressInner.style.width = "0%"; return; }
-      const q = questions[current];
-      updateProgress(); startTimer();
-      contentEl.innerHTML = "";
+    function renderQuestion() {
+      locked = false;
+      clearInterval(timerId);
 
+      if (!questions.length) {
+        contentEl.innerHTML = "<p>No questions for this mode/chapter yet.</p>";
+        timerEl.textContent = "⏱ 0s";
+        progressInner.style.width = "0%";
+        return;
+      }
+
+      const q = questions[current];
+      updateProgress();
+      startTimer();
+
+      contentEl.innerHTML = "";
       const card = document.createElement("div"); card.className = "card";
-      const meta = document.createElement("div"); meta.className = "meta-row"; meta.innerHTML = "<span>Q"+(current+1)+" of "+questions.length+"</span><span class='prize'>Practice Question</span>"; card.appendChild(meta);
+      const meta = document.createElement("div"); meta.className = "meta-row"; meta.innerHTML = "<span>Q" + (current + 1) + " of " + questions.length + "</span><span class='prize'>Practice Question</span>"; card.appendChild(meta);
       const chap = document.createElement("div"); chap.className = "chapter-tag"; chap.textContent = q.chapter; card.appendChild(chap);
       const qText = document.createElement("div"); qText.className = "question-text"; qText.textContent = q.q; card.appendChild(qText);
 
-      if(q.type === "mcq"){
+      if (q.type === "mcq") {
         const optionsBox = document.createElement("div"); optionsBox.className = "options";
         q.options.forEach((opt, idx) => {
-          const btn = document.createElement("button"); btn.className = "option-btn"; btn.innerHTML = "<span class='label'>"+String.fromCharCode(65 + idx)+".</span><span>"+opt+"</span>";
-          btn.onclick = ()=> handleOptionClick(idx);
+          const btn = document.createElement("button"); btn.className = "option-btn"; btn.innerHTML = "<span class='label'>" + String.fromCharCode(65 + idx) + ".</span><span>" + opt + "</span>";
+          btn.onclick = () => handleOptionClick(idx);
           optionsBox.appendChild(btn);
         });
         card.appendChild(optionsBox);
@@ -309,7 +428,7 @@
       const footerRow = document.createElement("div"); footerRow.className = "footer-row";
       const message = document.createElement("div"); message.className = "message"; message.textContent = "Answer before the timer ends. Short answers are auto-checked."; footerRow.appendChild(message);
 
-      // -- SHARE buttons (text + image)
+      // share buttons
       const shareContainer = document.createElement("div"); shareContainer.style.display = "flex"; shareContainer.style.gap = "6px"; shareContainer.style.marginTop = "6px";
       const shareTextBtn = document.createElement("button"); shareTextBtn.className = "pill-btn"; shareTextBtn.textContent = "🔗 Share Link"; shareTextBtn.onclick = shareQuestionText;
       const shareImageBtn = document.createElement("button"); shareImageBtn.className = "pill-btn"; shareImageBtn.textContent = "🖼 Share Image"; shareImageBtn.onclick = shareQuestionImage;
@@ -319,53 +438,50 @@
       contentEl.appendChild(footerRow);
     }
 
-    function setMode(newMode){
+    function setMode(newMode) {
       mode = newMode;
-      if(mode === "all"){ modeAllBtn.classList.add("active"); modeShortBtn.classList.remove("active"); } else { modeShortBtn.classList.add("active"); modeAllBtn.classList.remove("active"); }
-      score = 0; scoreEl.textContent = score; questions = getActiveQuestions(); current = 0; updateProgress(); renderQuestion();
+      if (mode === "all") { modeAllBtn.classList.add("active"); modeShortBtn.classList.remove("active"); }
+      else { modeShortBtn.classList.add("active"); modeAllBtn.classList.remove("active"); }
+      score = 0; scoreEl.textContent = score;
+      questions = getActiveQuestions();
+      current = 0;
+      updateProgress();
+      renderQuestion();
     }
 
-    function setChapter(ch){
+    function setChapter(ch) {
       currentChapter = ch;
       chapterButtons.forEach(btn => {
-        if(btn.getAttribute("data-chapter") === ch) btn.classList.add("active"); else btn.classList.remove("active");
+        if (btn.getAttribute("data-chapter") === ch) btn.classList.add("active"); else btn.classList.remove("active");
       });
-      score = 0; scoreEl.textContent = score; questions = getActiveQuestions(); current = 0; updateProgress(); renderQuestion();
+      score = 0; scoreEl.textContent = score;
+      questions = getActiveQuestions();
+      current = 0;
+      updateProgress();
+      renderQuestion();
     }
 
-    modeAllBtn.onclick = ()=> setMode("all");
-    modeShortBtn.onclick = ()=> setMode("short");
-    chapterButtons.forEach(btn => { btn.addEventListener("click", ()=> setChapter(btn.getAttribute("data-chapter"))); });
+    modeAllBtn.onclick = () => setMode("all");
+    modeShortBtn.onclick = () => setMode("short");
+    chapterButtons.forEach(btn => { btn.addEventListener("click", () => setChapter(btn.getAttribute("data-chapter"))); });
 
-    // ------------------- NEW: share utilities -------------------
+    // share utilities
     function getQuestionUrlText() {
       const base = window.location.origin + window.location.pathname;
-      // use 'current' (index in filtered 'questions') map back to index in allQuestions if desired
-      // simple approach: share q index in active questions
-      return base + "?q=" + current;
+      return base + "?q=" + current + (mode === "short" ? "&mode=short" : "");
     }
-
-    async function shareQuestionText(){
+    async function shareQuestionText() {
       const url = getQuestionUrlText();
       const q = questions[current];
       try {
-        if(navigator.share){
-          await navigator.share({ title: "Chemistry Question", text: q.q, url: url });
-          alert("Shared!");
-        } else if(navigator.clipboard){
-          await navigator.clipboard.writeText(url);
-          alert("Link copied to clipboard:\n" + url);
-        } else {
-          prompt("Copy this link:", url);
-        }
-      } catch(e){
-        alert("Share failed.");
-      }
+        if (navigator.share) { await navigator.share({ title: "Chemistry Question", text: q.q, url: url }); alert("Shared!"); }
+        else if (navigator.clipboard) { await navigator.clipboard.writeText(url); alert("Link copied to clipboard:\n" + url); }
+        else prompt("Copy this link:", url);
+      } catch(e) { alert("Share failed."); }
     }
 
-    // create an image (PNG) of the current question using Canvas
-    function createQuestionImage(q, width = 1080){
-      // returns a Promise that resolves with a Blob
+    // create image for question
+    function createQuestionImage(q, width = 1080) {
       return new Promise((resolve, reject) => {
         try {
           const padding = 40;
@@ -375,157 +491,119 @@
           const fontTitle = "700 36px Arial";
           const fontText = "600 28px Arial";
           const fontOption = "500 24px Arial";
-          // measure approximate height based on text lines
-          ctx.font = fontTitle;
-          const titleLines = wrapText(ctx, q.q, width - padding*2, fontTitle);
-          const optionLines = [];
-          ctx.font = fontOption;
-          (q.options || []).forEach(opt => {
-            optionLines.push(...wrapText(ctx, opt, width - padding*2 - 60, fontOption));
-          });
-          const totalLines = titleLines.length + optionLines.length + 4;
-          const height = padding*2 + totalLines * lineHeight;
-          canvas.width = width;
-          canvas.height = height;
-          // background
-          ctx.fillStyle = "#071028";
-          ctx.fillRect(0,0,canvas.width,canvas.height);
-          // header
-          ctx.fillStyle = "#34d399";
-          ctx.font = fontTitle;
-          ctx.fillText("Chemistry Champion", padding, padding + 6);
-          // question title
-          ctx.fillStyle = "#e5e7eb";
           ctx.font = fontText;
-          let y = padding + 46;
-          titleLines.forEach(line => {
-            ctx.fillText(line, padding, y);
-            y += lineHeight;
+          const titleLines = wrapText(ctx, q.q, width - padding*2, fontText);
+          ctx.font = fontOption;
+          let optionLinesCount = 0;
+          (q.options || []).forEach(opt => {
+            const wrapped = wrapText(ctx, opt, width - padding*2 - 60, fontOption);
+            optionLinesCount += Math.max(1, wrapped.length);
           });
-          y += 8;
-          // draw options
+          const totalLines = titleLines.length + optionLinesCount + 6;
+          const height = padding*2 + totalLines * lineHeight;
+          canvas.width = width; canvas.height = height;
+
+          // background
+          ctx.fillStyle = "#071028"; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+          // header
+          ctx.fillStyle = "#34d399"; ctx.font = fontTitle; ctx.fillText("Chemistry Champion", padding, padding + 8);
+
+          // question text
+          ctx.fillStyle = "#e5e7eb"; ctx.font = fontText;
+          let y = padding + 56;
+          titleLines.forEach(line => { ctx.fillText(line, padding, y); y += lineHeight; });
+          y += 6;
+
+          // options
           ctx.font = fontOption;
           (q.options || []).forEach((opt, idx) => {
-            // option letter circle
-            ctx.fillStyle = "#111827";
-            ctx.fillRect(padding, y - 22, 36, 36);
-            ctx.fillStyle = "#34d399";
-            ctx.font = "700 20px Arial";
-            ctx.fillText(String.fromCharCode(65 + idx), padding + 10, y + 6);
-            // option text
-            ctx.fillStyle = "#e5e7eb";
+            // circle/box for letter
+            ctx.fillStyle = "#111827"; ctx.fillRect(padding, y - 22, 36, 36);
+            ctx.fillStyle = "#34d399"; ctx.font = "700 20px Arial"; ctx.fillText(String.fromCharCode(65 + idx), padding + 10, y + 6);
+            ctx.fillStyle = "#e5e7eb"; ctx.font = fontOption;
             const wrapped = wrapText(ctx, opt, width - padding*2 - 60, fontOption);
-            wrapped.forEach((ln, li) => {
-              ctx.fillText(ln, padding + 60, y + (li*lineHeight));
-            });
+            wrapped.forEach((ln, li) => { ctx.fillText(ln, padding + 60, y + (li*lineHeight)); });
             y += (Math.max(1, wrapped.length) * lineHeight) + 8;
           });
 
-          // footer / watermark
-          ctx.fillStyle = "#9ca3af";
-          ctx.font = "500 18px Arial";
-          ctx.fillText("CBSE Class 10 · Chemistry Champion", padding, canvas.height - 10);
+          // footer
+          ctx.fillStyle = "#9ca3af"; ctx.font = "500 18px Arial";
+          ctx.fillText("CBSE Class 10 · Chemistry Champion", padding, canvas.height - 14);
 
-          // convert to blob
-          canvas.toBlob(blob => {
-            if(blob) resolve(blob);
-            else reject(new Error("canvas toBlob failed"));
-          }, "image/png");
-        } catch (err) { reject(err); }
+          canvas.toBlob(blob => { if (blob) resolve(blob); else reject(new Error("toBlob failed")); }, "image/png");
+        } catch(err){ reject(err); }
       });
 
-      // helper: wrap text - uses given font by set on ctx
-      function wrapText(ctxLocal, text, maxWidth, font){
-        if(font) ctxLocal.font = font;
+      function wrapText(ctxLocal, text, maxWidth, font) {
+        if (font) ctxLocal.font = font;
         const words = text.split(" ");
-        const lines = [];
-        let currentLine = "";
-        for(let i=0;i<words.length;i++){
-          const testLine = currentLine ? currentLine + " " + words[i] : words[i];
-          const w = ctxLocal.measureText(testLine).width;
-          if(w > maxWidth && currentLine){
-            lines.push(currentLine);
-            currentLine = words[i];
-          } else {
-            currentLine = testLine;
-          }
+        const lines = []; let currentLine = "";
+        for (let w of words) {
+          const testLine = currentLine ? currentLine + " " + w : w;
+          const m = ctxLocal.measureText(testLine).width;
+          if (m > maxWidth && currentLine) { lines.push(currentLine); currentLine = w; } else { currentLine = testLine; }
         }
-        if(currentLine) lines.push(currentLine);
+        if (currentLine) lines.push(currentLine);
         return lines;
       }
     }
 
-    // share the image: try native share with files, else open in new tab / copy
-    async function shareQuestionImage(){
+    async function shareQuestionImage() {
       const q = questions[current];
-      if(!q) { alert("No question to share."); return; }
+      if (!q) { alert("No question to share."); return; }
       try {
         const blob = await createQuestionImage(q, 1080);
-        // if native share supports files
-        if(navigator.canShare && navigator.canShare({ files: [new File([blob], "question.png", { type: "image/png" })] })){
+        // native share with files
+        if (navigator.canShare && navigator.canShare({ files: [new File([blob], "question.png", { type: "image/png" })] })) {
           await navigator.share({ files: [new File([blob], "chemistry-question.png", { type: "image/png" })], title: "Chemistry question", text: q.q });
           return;
         }
-        // some browsers support navigator.share with url + not files, so fallback to data url open
-        if(navigator.share && !navigator.canShare){
-          // create object URL and share link
+        // share as URL
+        if (navigator.share) {
           const url = URL.createObjectURL(blob);
-          await navigator.share({ title: "Chemistry question", text: q.q, url });
-          URL.revokeObjectURL(url);
-          return;
+          await navigator.share({ title: "Chemistry question", text: q.q, url }); URL.revokeObjectURL(url); return;
         }
-
-        // fallback: copy dataURL to clipboard if supported
-        if(navigator.clipboard && navigator.clipboard.write){
-          const data = await blobToClipboardItem(blob);
-          await navigator.clipboard.write([data]);
-          alert("Question image copied to clipboard. Paste into WhatsApp or chat.");
-          return;
-        }
-
-        // final fallback: open image in new tab for manual save/share
-        const imageUrl = URL.createObjectURL(blob);
-        window.open(imageUrl, "_blank");
-        setTimeout(()=> URL.revokeObjectURL(imageUrl), 10000);
-      } catch (err){
-        console.error(err);
-        alert("Could not create/share image. Try the link share instead.");
-      }
-
-      // helper: convert blob -> ClipboardItem for write()
-      function blobToClipboardItem(blob){
-        try {
+        // copy to clipboard (if supported)
+        if (navigator.clipboard && window.ClipboardItem) {
           const item = new ClipboardItem({ [blob.type]: blob });
-          return item;
-        } catch(e){
-          // older browsers may not support ClipboardItem constructor
-          return Promise.reject(e);
+          await navigator.clipboard.write([item]);
+          alert("Question image copied to clipboard. Paste into chat.");
+          return;
         }
+        // fallback open
+        const imageUrl = URL.createObjectURL(blob);
+        window.open(imageUrl, "_blank"); setTimeout(()=> URL.revokeObjectURL(imageUrl), 10000);
+      } catch (err) {
+        console.error(err); alert("Could not create/share image. Try link share.");
       }
     }
 
-    // init / load
-    (function init(){
+    // INIT
+    (function init() {
       playerName = prompt("Enter player name (optional):") || "Player";
       playerNameLabel.textContent = playerName;
       initAudio();
       scoreEl.textContent = score;
+      // load from URL: q= index in active questions
+      mode = (new URLSearchParams(window.location.search).get("mode") === "short") ? "short" : "all";
+      const qParam = parseInt(new URLSearchParams(window.location.search).get("q"));
+      // prepare questions
       questions = getActiveQuestions();
-
-      // if URL contains ?q=<index>, jump to that question (index in active questions)
-      const params = new URLSearchParams(window.location.search);
-      const qIndex = parseInt(params.get("q"));
-      if(!isNaN(qIndex) && qIndex >= 0 && qIndex < questions.length){
-        current = qIndex;
-      } else {
-        current = 0;
-      }
-
+      if (!isNaN(qParam) && qParam >= 0 && qParam < questions.length) current = qParam;
+      else current = 0;
+      // reflect mode toggle
+      if (mode === "short") { modeAllBtn.classList.remove("active"); modeShortBtn.classList.add("active"); }
       updateProgress();
       renderQuestion();
     })();
 
+    // allow direct navigation if user clicked share link with q param after load
+    window.addEventListener("popstate", () => {
+      const qParam = parseInt(new URLSearchParams(window.location.search).get("q"));
+      if (!isNaN(qParam) && qParam >=0 && qParam < questions.length) { current = qParam; renderQuestion(); }
+    });
+
   </script>
 </body>
 </html>
-
