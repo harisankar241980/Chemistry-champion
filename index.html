@@ -93,394 +93,336 @@
     let mode = "all"; // "all" or "short"
     let currentChapter = "All";
 
-    // FULL QUESTION BANK — expanded, includes extra short questions for Reactions & Metals
-   const allQuestions = [
-  // ------------------------------
-  // Chemical Reactions & Equations (15 items)
-  // ------------------------------
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Which gas is released when zinc reacts with dilute hydrochloric acid?", options: ["Oxygen","Carbon dioxide","Hydrogen","Nitrogen"], answer: 2 },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Which reaction is: 2H2 + O2 → 2H2O ?", options: ["Combination","Decomposition","Displacement","Redox"], answer: 0 },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "What is the product of decomposition of calcium carbonate on strong heating?", options: ["CaO + CO2","Ca + CO2","CaCO3","Ca(OH)2"], answer: 0 },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Which of these is a displacement reaction?", options: ["CaCO3 → CaO + CO2","Zn + CuSO4 → ZnSO4 + Cu","N2 + 3H2 → 2NH3","2H2O → 2H2 + O2"], answer: 1 },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Rusting of iron is an example of which type of reaction?", options: ["Oxidation","Reduction","Neutralisation","Precipitation"], answer: 0 },
-  { chapter: "Chemical Reactions & Equations", type: "short", q: "Define oxidation in terms of oxygen.", acceptableAnswers: ["addition of oxygen","gain of oxygen","addition of oxygen to a substance"] },
-  { chapter: "Chemical Reactions & Equations", type: "short", q: "Write the balanced equation for magnesium burning in oxygen.", acceptableAnswers: ["2mg + o2 → 2mgo","2 mg + o2 → 2 mgo","2mg+o2→2mgo"] },
-  { chapter: "Chemical Reactions & Equations", type: "short", q: "Give an example of a decomposition reaction.", acceptableAnswers: ["2hgO → 2hg + O2","heating calcium carbonate gives caO + co2","electrolysis of water"] },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Which reaction type absorbs energy from surroundings?", options: ["Exothermic","Endothermic","Redox","Neutralisation"], answer: 1 },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "In a displacement reaction, which of these occurs?", options: ["A more reactive metal displaces a less reactive metal","A less reactive metal displaces a more reactive metal","Two compounds form a single product","Gas is formed"], answer: 0 },
-  { chapter: "Chemical Reactions & Equations", type: "short", q: "What is a balanced chemical equation?", acceptableAnswers: ["an equation with same number of atoms on both sides","same number of atoms on both sides","atoms balanced on both sides"] },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Which of the following is a redox reaction?", options: ["Zn + CuSO4 → ZnSO4 + Cu","NaCl + AgNO3 → AgCl + NaNO3","HCl + NaOH → NaCl + H2O","CaCO3 → CaO + CO2"], answer: 0 },
-  { chapter: "Chemical Reactions & Equations", type: "short", q: "What is meant by 'combination reaction'?", acceptableAnswers: ["two or more substances combine to form one","combination of substances to form single product"] },
-  { chapter: "Chemical Reactions & Equations", type: "mcq", q: "Which product is formed when magnesium reacts with oxygen?", options: ["MgO","MgO2","Mg2O","Mg(OH)2"], answer: 0 },
-  { chapter: "Chemical Reactions & Equations", type: "short", q: "Give one real-life example of a combustion reaction.", acceptableAnswers: ["burning of wood","burning of candle","combustion of petrol"] },
+    // FULL QUESTION BANK — Metals & Non-metals replaced/expanded with your school questions
+    const allQuestions = [
+      // Chemical Reactions & Equations — MCQ + short
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which gas is released when zinc reacts with dilute hydrochloric acid?", options:["Oxygen","Carbon dioxide","Hydrogen","Nitrogen"], answer:2 },
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which type of reaction is 2HgO → 2Hg + O₂?", options:["Combination","Decomposition","Displacement","Double displacement"], answer:1 },
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which of these is a displacement reaction?", options:["CaCO₃ → CaO + CO₂","Zn + CuSO₄ → ZnSO₄ + Cu","N₂ + 3H₂ → 2NH₃","2H₂O → 2H₂ + O₂"], answer:1 },
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Combustion is an example of which type of reaction?", options:["Oxidation","Reduction","Neutralisation","Precipitation"], answer:0 },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"Define oxidation in terms of oxygen.", acceptableAnswers:["addition of oxygen","gain of oxygen","addition of oxygen to a substance"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"Write balanced equation for magnesium burning in oxygen.", acceptableAnswers:["2mg + o2 → 2mgo","2 mg + o2 → 2 mgo","2mg+o2→2mgo"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"What is a displacement reaction? Give one example.", acceptableAnswers:["one element replaces another, eg zn + cusO4 → znso4 + cu","zn + cuso4 → znso4 + cu","one element replaces another"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"Give an example of a redox reaction.", acceptableAnswers:["rusting of iron","zn + cuSo4 → znSo4 + cu","combustion of carbon"] },
+      { chapter:"Chemical Reactions & Equations", type:"short", q:"What happens in a combination reaction?", acceptableAnswers:["two or more substances combine to form one","combination of two substances to make one product"] },
 
-  // ------------------------------
-  // Acids, Bases & Salts (15 items)
-  // ------------------------------
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which acid is present in vinegar?", options: ["Citric acid","Acetic acid","Hydrochloric acid","Sulphuric acid"], answer: 1 },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "What is the pH of pure water at 25°C?", options: ["0","7","14","1"], answer: 1 },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which salt is called baking soda?", options: ["NaCl","NaHCO3","Na2CO3","KCl"], answer: 1 },
-  { chapter: "Acids, Bases & Salts", type: "short", q: "Name the acid present in lemon.", acceptableAnswers: ["citric acid"] },
-  { chapter: "Acids, Bases & Salts", type: "short", q: "Name the gas that turns lime water milky.", acceptableAnswers: ["carbon dioxide","co2","carbon dioxide gas"] },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which indicator turns pink in a base?", options: ["Methyl orange","Phenolphthalein","Litmus","Turmeric"], answer: 1 },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Tooth decay starts when pH of mouth falls below:", options: ["7.0","6.5","5.5","4.5"], answer: 2 },
-  { chapter: "Acids, Bases & Salts", type: "short", q: "What is a neutralisation reaction?", acceptableAnswers: ["reaction between acid and base to form salt and water","acid + base → salt + water"] },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which of these is a strong acid?", options: ["HCl","CH3COOH","H2CO3","NH3"], answer: 0 },
-  { chapter: "Acids, Bases & Salts", type: "short", q: "Give one use of sodium bicarbonate (baking soda).", acceptableAnswers: ["baking","antacid","cleaning agent"] },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which salt is used in cooking?", options: ["NaCl","Na2CO3","NaHCO3","CaCO3"], answer: 0 },
-  { chapter: "Acids, Bases & Salts", type: "short", q: "Name an indicator extracted from a natural source.", acceptableAnswers: ["turmeric","litmus","red cabbage"] },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which base is commonly used in soap making?", options: ["NaOH","KCl","HCl","NH4OH"], answer: 0 },
-  { chapter: "Acids, Bases & Salts", type: "short", q: "What is pH a measure of?", acceptableAnswers: ["hydrogen ion concentration","acidity or alkalinity","h+ concentration"] },
-  { chapter: "Acids, Bases & Salts", type: "mcq", q: "Which salt is formed when sodium hydroxide reacts with hydrochloric acid?", options: ["NaCl","Na2SO4","KCl","CaCl2"], answer: 0 },
+      // Acids, Bases & Salts — MCQ + short
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"Which acid is present in vinegar?", options:["Citric acid","Acetic acid","Hydrochloric acid","Sulphuric acid"], answer:1 },
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"What is the pH of a neutral solution at 25°C?", options:["0","7","14","1"], answer:1 },
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"Which salt is called baking soda?", options:["NaCl","NaHCO₃","Na₂CO₃","CaCO₃"], answer:1 },
+      { chapter:"Acids, Bases & Salts", type:"short", q:"Name the acid present in lemon.", acceptableAnswers:["citric acid"] },
+      { chapter:"Acids, Bases & Salts", type:"short", q:"Name the gas that turns lime water milky.", acceptableAnswers:["carbon dioxide","co2","carbon dioxide gas"] },
 
-  // ------------------------------
-  // Metals & Non-metals (15 items)
-  // ------------------------------
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which metal is liquid at room temperature?", options: ["Iron","Mercury","Aluminium","Sodium"], answer: 1 },
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which property allows metals to be drawn into wires?", options: ["Malleability","Ductility","Conductivity","Sonority"], answer: 1 },
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which metal is used for galvanisation of iron?", options: ["Copper","Zinc","Silver","Lead"], answer: 1 },
-  { chapter: "Metals & Non-metals", type: "short", q: "Which property of metals allows them to be beaten into thin sheets?", acceptableAnswers: ["malleability","it is malleable"] },
-  { chapter: "Metals & Non-metals", type: "short", q: "Why is sodium stored under kerosene?", acceptableAnswers: ["because it reacts with air and water","to prevent reaction with moisture and air"] },
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which metal reacts vigorously with water?", options: ["Gold","Sodium","Copper","Silver"], answer: 1 },
-  { chapter: "Metals & Non-metals", type: "short", q: "Give one use of aluminium.", acceptableAnswers: ["making aircraft parts","utensils","lightweight structures"] },
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which metal is obtained from bauxite?", options: ["Iron","Aluminium","Copper","Zinc"], answer: 1 },
-  { chapter: "Metals & Non-metals", type: "short", q: "What is corrosion? Give an example.", acceptableAnswers: ["damage of metals by air and moisture","rusting of iron","corrosion is rusting"] },
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which element is a non-metal?", options: ["Calcium","Sulphur","Aluminium","Iron"], answer: 1 },
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which metal is a good conductor of electricity?", options: ["Copper","Glass","Plastic","Wood"], answer: 0 },
-  { chapter: "Metals & Non-metals", type: "short", q: "State one property that non-metals often show.", acceptableAnswers: ["brittle","poor conductor of heat and electricity","non-lustrous"] },
-  { chapter: "Metals & Non-metals", type: "mcq", q: "Which of these is an alkali metal?", options: ["Sodium","Calcium","Magnesium","Aluminium"], answer: 0 },
-  { chapter: "Metals & Non-metals", type: "short", q: "Why are alloys used instead of pure metals?", acceptableAnswers: ["to improve strength","to increase toughness","to reduce corrosion"] },
+      // --- Metals & Non-metals (SCHOOL QUESTIONS MERGED) ---
+      // 1 (A-R)
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "1. Assertion (A): Hydrogen gas is not evolved when a metal reacts with nitric acid. Reason (R): Nitric acid is a strong oxidizing agent. Choose: a/b/c/d",
+        options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
+        answer: 0
+      },
+      // 2
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "2. Assertion: Carbon reacts with oxygen to form CO₂ which is an acidic oxide. Reason: Non-metals form acidic oxides. Choose: a/b/c/d",
+        options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
+        answer: 0
+      },
+      // 3
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "3. Assertion: Non-metals are electronegative in nature. Reason: Non-metals have tendency to lose electrons. Choose: a/b/c/d",
+        options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
+        answer: 2
+      },
+      // 4
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "4. Assertion: Magnesium chloride is an ionic compound. Reason: Metals and non-metals react by mutual transfer of electrons. Choose: a/b/c/d",
+        options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
+        answer: 0
+      },
+      // 5
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "5. Which oxide(s) of iron would be obtained on prolonged reaction of iron with steam?",
+        options: ["FeO", "Fe₂O₃", "Fe₃O₄", "Fe₂O₃ and Fe₂O₄"],
+        answer: 2
+      },
+      // 6
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "6. Which of the following are not ionic compounds? (i) KCl (ii) HCl (iii) CCl₄ (iv) NaCl",
+        options: ["i and ii", "ii and iii", "iii and iv", "i and iii"],
+        answer: 1
+      },
+      // 7
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "7. An element X has 3 electrons in the M shell. Identify the element and the type of oxide formed by it.",
+        options: ["Mg, Basic", "Al, Basic", "Mg, Amphoteric", "Al, Amphoteric"],
+        answer: 3
+      },
+      // 8
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "8. Which of the listed reactions is/are incorrect for extracting the metal shown? (P) Fe₂O₃ + 3C → 4Fe + 3CO₂  (Q) Na₂O + C → 2Na + CO  (R) ZnO + C → Zn + CO  (S) CaO + C → Ca + CO  Choose incorrect.",
+        options: ["Only P", "Only Q", "P & R", "Q & S"],
+        answer: 3
+      },
+      // 9
+      {
+        chapter: "Metals & Non-metals",
+        type: "mcq",
+        q: "9. Which among the following alloys contains a non-metal?",
+        options: ["Brass", "Steel", "Amalgam", "Bronze"],
+        answer: 1
+      },
+      // 10 short
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "10. Bronze can be used in place of copper to make electric circuits. Do you agree? Give reason.",
+        acceptableAnswers: [
+          "no, bronze is an alloy of copper with tin and is not as good a conductor as copper",
+          "bronze is less conductive than copper so it is not suitable for making circuits",
+          "not agree - bronze is not as good conductor as copper"
+        ]
+      },
+      // 11 short
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "11. What are the constituents of solder alloy? Which property of solder makes it suitable for welding electrical wires?",
+        acceptableAnswers: [
+          "lead and tin; low melting point and good conductor",
+          "pb and sn; low melting point and good electrical conductivity",
+          "lead (pb) and tin (sn); low melting point makes it suitable"
+        ]
+      },
+      // 12a
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "12a. Name a metal that does not react with cold as well as hot water but reacts with steam.",
+        acceptableAnswers: ["iron", "fe"]
+      },
+      // 12b
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "12b. Name a metal that does not react with any physical state of water.",
+        acceptableAnswers: ["gold", "au", "platinum", "silver"]
+      },
+      // 13a
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "13a. Show formation of Na₂O by transfer of electrons between atoms.",
+        acceptableAnswers: ["na loses electrons to form na+ and o gains electrons to form o2-; na+ and o2- combine to form na2o", "na -> na+ + e-, o + 2e- -> o2-, na+ + o2- -> na2o"]
+      },
+      // 13b
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "13b. Why are ionic compounds usually hard?",
+        acceptableAnswers: [
+          "because of strong electrostatic forces between oppositely charged ions that form a crystalline lattice",
+          "strong electrostatic attraction makes them hard to break"
+        ]
+      },
+      // 14
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "14. A metal M does not liberate hydrogen from acids but reacts with oxygen to give a black product. Identify M and the black product and explain.",
+        acceptableAnswers: [
+          "copper; cupric oxide (cuo) forms on heating; copper is below hydrogen so does not liberate hydrogen from acids",
+          "cu and cuo; copper reacts with oxygen on heating to form black cuo"
+        ]
+      },
+      // 15
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "15. Name the compound formed between elements with atomic numbers 12 and 8. Which of these will form a cation?",
+        acceptableAnswers: ["mgo; magnesium forms cation (mg2+)"]
+      },
+      // 16
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "16. Name two metals which react violently with water. Write two observations when such a metal is dropped in water and how to identify the gas evolved.",
+        acceptableAnswers: [
+          "sodium and potassium; vigorous reaction, hydrogen gas evolves, heat produced; gas burns with pop - hydrogen",
+          "k and na; reaction is violent and exothermic; gas ignites with pop (hydrogen)"
+        ]
+      },
+      // 17
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "17. When calcium is added to water the gas evolved does not catch fire; but on adding sodium metal to water it catches fire. Why?",
+        acceptableAnswers: [
+          "because heat produced with sodium is enough to ignite hydrogen whereas with calcium heat is not sufficient",
+          "sodium produces more heat and hydrogen catches fire"
+        ]
+      },
+      // 18a
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "18a. Why does reactivity of aluminum decrease on dipping in conc. HNO3?",
+        acceptableAnswers: [
+          "aluminium forms a protective oxide layer (al2o3) which makes it passive",
+          "passivation due to formation of al2o3"
+        ]
+      },
+      // 18b
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "18b. Why cannot carbon reduce oxides of Na or Mg?",
+        acceptableAnswers: [
+          "because na and mg are more reactive than carbon and carbon cannot reduce their oxides",
+          "na and mg are above carbon in reactivity series"
+        ]
+      },
+      // 18c
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "18c. Why is NaCl not a conductor in solid state but conducts in aqueous solution or molten state?",
+        acceptableAnswers: [
+          "ions cannot move in solid state, but in molten or aqueous state ions are free to move and conduct electricity",
+          "mobility of na+ and cl- in solution/molten"
+        ]
+      },
+      // 18d
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "18d. Why are iron articles galvanised?",
+        acceptableAnswers: [
+          "to prevent rusting by coating with zinc (zinc acts as protective layer and sacrificial anode)",
+          "galvanisation prevents corrosion"
+        ]
+      },
+      // 18e
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "18e. Why are metals like Na, K, Ca and Mg not found free in nature?",
+        acceptableAnswers: [
+          "they are highly reactive and form compounds such as oxides and salts",
+          "they react with substances in nature and do not occur free"
+        ]
+      },
+      // 18f
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "18f. Why are sodium and potassium stored under kerosene oil?",
+        acceptableAnswers: [
+          "to prevent reaction with moisture and oxygen; to avoid accidental ignition as they react vigorously with air and water",
+          "stored under kerosene to keep them from contacting air/water"
+        ]
+      },
+      // 19a
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "19a. Salt of metal M shows displacement with iron but not with silver. Metal found as sulphide ore 'M2S'. Name metal M.",
+        acceptableAnswers: ["copper", "cu"]
+      },
+      // 19b
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "19b. Which process is suitable for extraction of this metal M from M2S (sulphide ore)?",
+        acceptableAnswers: ["roasting", "roasting of sulphide ore"]
+      },
+      // 19c
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "19c. Which process is used for obtaining pure metal M and give key equations for electrolytic refining (for copper).",
+        acceptableAnswers: [
+          "electrolytic refining; cu -> cu2+ + 2e- at anode; cu2+ + 2e- -> cu at cathode",
+          "electrolytic refining of copper with copper sulphate solution"
+        ]
+      },
+      // 20a
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "20a. Why do ionic compounds generally have high melting and boiling points?",
+        acceptableAnswers: [
+          "strong electrostatic attraction between oppositely charged ions requires large energy to break",
+          "strong ionic bonds make melting/boiling points high"
+        ]
+      },
+      // 20b
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "20b. List two important properties of ionic compounds other than high mp/bp.",
+        acceptableAnswers: [
+          "they conduct electricity in molten or aqueous state; many are soluble in water",
+          "soluble in water; conduct electricity when molten/aqueous"
+        ]
+      },
+      // 20c
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "20c. Give ions present in examples such as NaCl, MgO, LiCl etc.",
+        acceptableAnswers: [
+          "na+ and cl-; mg2+ and o2-; li+ and cl-",
+          "na+ & cl-, mg2+ & o2-, li+ & cl-"
+        ]
+      },
+      // 20d
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "20d. Describe briefly an activity to test conductivity of ionic compounds in aqueous solution.",
+        acceptableAnswers: [
+          "set up two electrodes connected to a battery and bulb, insert in solution of salt; bulb lights if conducts because ions carry charge",
+          "use electrodes and battery in salt solution; observation: bulb lights"
+        ]
+      },
+      // 20e
+      {
+        chapter: "Metals & Non-metals",
+        type: "short",
+        q: "20e. Can ionic bonds form between two non-metals? Why?",
+        acceptableAnswers: [
+          "no, non-metals generally form covalent bonds as they do not form cations readily",
+          "ionic bond between two non-metals not possible because they do not form positive ions"
+        ]
+      },
 
-  // ------------------------------
-  // Carbon & Its Compounds (15 items)
-  // ------------------------------
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "How many covalent bonds are present in methane (CH4)?", options: ["1","2","3","4"], answer: 3 },
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "What is the functional group in alcohols?", options: ["Carbonyl","Hydroxyl","Carboxyl","Amino"], answer: 1 },
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "IUPAC name of CH3CH2CH2CH3 is:", options: ["Propane","Methane","Butane","Ethane"], answer: 2 },
-  { chapter: "Carbon & Its Compounds", type: "short", q: "Name the functional group present in ethanol (C2H5OH).", acceptableAnswers: ["hydroxyl","oh","–oh"] },
-  { chapter: "Carbon & Its Compounds", type: "short", q: "What is homologous series?", acceptableAnswers: ["series with same functional group and successive members differ by -CH2-","homologous series"] },
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "Which bond type is present in ethene (C2H4)?", options: ["Single bond","Double bond","Triple bond","Ionic bond"], answer: 1 },
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "What is the common name of ethanoic acid?", options: ["Acetic acid","Formic acid","Oxalic acid","Citric acid"], answer: 0 },
-  { chapter: "Carbon & Its Compounds", type: "short", q: "Give one use of ethanol.", acceptableAnswers: ["solvent","fuel","antiseptic"] },
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "Which of these is an organic compound?", options: ["NaCl","CH4","MgO","H2O"], answer: 1 },
-  { chapter: "Carbon & Its Compounds", type: "short", q: "What is an organic compound?", acceptableAnswers: ["compound containing carbon","carbon containing compound"] },
-  { chapter: "Carbon & Its Compounds", type: "short", q: "Name a product obtained from fractional distillation of petroleum.", acceptableAnswers: ["petrol","diesel","kerosene"] },
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "Which carbon allotrope is used in pencils?", options: ["Diamond","Graphite","Fullerene","Buckyball"], answer: 1 },
-  { chapter: "Carbon & Its Compounds", type: "short", q: "What is combustion of carbon called when it gives CO2?", acceptableAnswers: ["complete combustion","combustion producing carbon dioxide"] },
-  { chapter: "Carbon & Its Compounds", type: "mcq", q: "Which is saturated hydrocarbon?", options: ["Ethene","Ethane","Ethyne","Benzene"], answer: 1 },
-  { chapter: "Carbon & Its Compounds", type: "short", q: "What is functional group in carboxylic acid?", acceptableAnswers: ["carboxyl","-cooh","cooh group"] }
+      // Carbon & Its Compounds — MCQ + short
+      { chapter:"Carbon & Its Compounds", type:"mcq", q:"How many covalent bonds are present in methane (CH₄)?", options:["1","2","3","4"], answer:3 },
+      { chapter:"Carbon & Its Compounds", type:"mcq", q:"The IUPAC name of CH₃–CH₂–CH₂–CH₃ is:", options:["Propane","Methane","Butane","Ethane"], answer:2 },
+      { chapter:"Carbon & Its Compounds", type:"mcq", q:"What is the common name of ethanoic acid?", options:["Formic acid","Acetic acid","Oxalic acid","Citric acid"], answer:1 },
+      { chapter:"Carbon & Its Compounds", type:"short", q:"Name the functional group present in ethanol (C₂H₅OH).", acceptableAnswers:["hydroxyl","oh","oh group","–oh"] },
+      { chapter:"Carbon & Its Compounds", type:"short", q:"What do we call a series of organic compounds having the same functional group and successive members differing by –CH₂– unit?", acceptableAnswers:["homologous series"] },
 
-  /* ====== Questions imported from school (Metals & Non-metals) ======
-   Source: "Metals and Non metals q1.pdf" (questions) and
-           "metals and Non metals answer key.pdf" (answer key).
-   Citations: :contentReference[oaicite:2]{index=2} :contentReference[oaicite:3]{index=3}
-*/
-
-const schoolMetalsQuestions = [
-  // 1 - Assertion/Reason (A-R) style -> treat as MCQ with options a/b/c/d
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "1. Assertion (A): Hydrogen gas is not evolved when a metal reacts with nitric acid.  Reason (R): Nitric acid is a strong oxidizing agent. (Choose: a: Both A and R true & R explains A; b: Both true but R not explain; c: A true R false; d: A false R true)",
-    options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
-    answer: 0
-  },
-
-  // 2
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "2. Assertion: Carbon reacts with oxygen to form CO₂ which is an acidic oxide. Reason: Non-metals form acidic oxides. (a/b/c/d)",
-    options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
-    answer: 0
-  },
-
-  // 3
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "3. Assertion: Non-metals are electronegative in nature. Reason: Non-metals have tendency to lose electrons. (a/b/c/d)",
-    options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
-    answer: 2
-  },
-
-  // 4
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "4. Assertion: Magnesium chloride is an ionic compound. Reason: Metals and non-metals react by mutual transfer of electrons. (a/b/c/d)",
-    options: ["a. A and R true; R explains A", "b. A and R true; R does not explain A", "c. A true; R false", "d. A false; R true"],
-    answer: 0
-  },
-
-  // 5
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "5. Which of the following oxide(s) of iron would be obtained on prolonged reaction of iron with steam?",
-    options: ["FeO", "Fe₂O₃", "Fe₃O₄", "Fe₂O₃ and Fe₂O₄"],
-    answer: 2   // answer key: c
-  },
-
-  // 6
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "6. Which of the following are not ionic compounds? (i) KCl (ii) HCl (iii) CCl₄ (iv) NaCl",
-    options: ["i and ii", "ii and iii", "iii and iv", "i and iii"],
-    answer: 1   // answer key: b (ii & iii)
-  },
-
-  // 7
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "7. An element X has 3 electrons in the M shell. Identify the element and the type of oxide formed by it.",
-    options: ["Mg, Basic", "Al, Basic", "Mg, Amphoteric", "Al, Amphoteric"],
-    answer: 3   // answer key: d
-  },
-
-  // 8
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "8. Which of the listed reactions is/are incorrect for extracting the metal shown? (P) Fe₂O₃ + 3C → 4Fe + 3CO₂  (Q) Na₂O + C → 2Na + CO  (R) ZnO + C → Zn + CO  (S) CaO + C → Ca + CO  Choose incorrect.",
-    options: ["Only P", "Only Q", "P & R", "Q & S"],
-    answer: 3   // answer key: d (Q & S incorrect)
-  },
-
-  // 9
-  {
-    chapter: "Metals & Non-metals",
-    type: "mcq",
-    q: "9. Which among the following alloys contains a non-metal?",
-    options: ["Brass", "Steel", "Amalgam", "Bronze"],
-    answer: 1   // answer key: b (Steel contains carbon — non-metal)
-  },
-
-  // 10 - longer explanation (short answer)
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "10. Bronze can be used in place of copper to make electric circuits. Do you agree? Give reason.",
-    acceptableAnswers: [
-      "no, bronze is an alloy of copper with tin and is not as good a conductor as copper",
-      "bronze is less conductive than copper so it is not suitable for making circuits",
-      "not agree - bronze is not as good conductor as copper"
-    ]
-  },
-
-  // 11 - short (constituents + property)
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "11. What are the constituents of solder alloy? Which property of solder makes it suitable for welding electrical wires?",
-    acceptableAnswers: [
-      "lead and tin; low melting point and good conductor",
-      "pb and sn; low melting point and good electrical conductivity",
-      "lead (pb) and tin (sn); low melting point makes it suitable"
-    ]
-  },
-
-  // 12a,b
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "12a. Name a metal that does not react with cold as well as hot water but reacts with steam.",
-    acceptableAnswers: ["iron", "fe"]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "12b. Name a metal that does not react with any physical state of water.",
-    acceptableAnswers: ["gold", "au", "platinum", "silver (for many conditions)"]
-  },
-
-  // 13a,b (13a show electron transfer — we include short text)
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "13a. Show formation of Na₂O by transfer of electrons between atoms. (Short answer expected - Na → Na⁺ etc.)",
-    acceptableAnswers: ["na loses electrons to form na+ and o gains electrons to form o2-; na+ and o2- combine to form na2o", "na -> na+ + e-, o + 2e- -> o2-, na+ + o2- -> na2o"]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "13b. Why are ionic compounds usually hard?",
-    acceptableAnswers: [
-      "because of strong electrostatic forces between oppositely charged ions that form a crystalline lattice",
-      "strong electrostatic attraction makes them hard to break"
-    ]
-  },
-
-  // 14 - identification + reaction (short)
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "14. A metal M does not liberate hydrogen from acids but reacts with oxygen to give a black product. Identify M and the black product and explain.",
-    acceptableAnswers: [
-      "copper; cupric oxide (cuo) forms on heating; copper is below hydrogen so does not liberate hydrogen from acids",
-      "cu and cuo; copper reacts with oxygen on heating to form black cuo"
-    ]
-  },
-
-  // 15 - compound between atomic numbers 12 and 8 -> 12=Mg, 8=O -> MgO
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "15. Name the compound formed between elements with atomic numbers 12 and 8. Which of these will form a cation?",
-    acceptableAnswers: ["mgo; magnesium forms cation (mg2+)"]
-  },
-
-  // 16 - reactive metals with water
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "16. Name two metals which react violently with water. Write two observations when such a metal is dropped in water and how to identify the gas evolved.",
-    acceptableAnswers: [
-      "sodium and potassium; vigorous reaction, hydrogen gas evolves, heat produced; gas burns with pop - hydrogen",
-      "k and na; reaction is violent and exothermic; gas ignites with pop (hydrogen)"
-    ]
-  },
-
-  // 17 - why calcium H2 not catch fire but sodium does
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "17. When calcium is added to water the gas evolved does not catch fire; but on adding sodium metal to water it catches fire. Why?",
-    acceptableAnswers: [
-      "because heat produced with sodium is enough to ignite hydrogen whereas with calcium heat is not sufficient",
-      "sodium produces more heat and hydrogen catches fire"
-    ]
-  },
-
-  // 18 series - multiple short parts (break into a few short questions)
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "18a. Why does reactivity of aluminum decrease on dipping in conc. HNO3?",
-    acceptableAnswers: [
-      "aluminium forms a protective oxide layer (al2o3) which makes it passive",
-      "passivation due to formation of al2o3"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "18b. Why cannot carbon reduce oxides of Na or Mg?",
-    acceptableAnswers: [
-      "because na and mg are more reactive than carbon and carbon cannot reduce their oxides",
-      "na and mg are above carbon in reactivity series"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "18c. Why is NaCl not a conductor in solid state but conducts in aqueous solution or molten state?",
-    acceptableAnswers: [
-      "ions cannot move in solid state, but in molten or aqueous state ions are free to move and conduct electricity",
-      "mobility of na+ and cl- in solution/molten"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "18d. Why are iron articles galvanised?",
-    acceptableAnswers: [
-      "to prevent rusting by coating with zinc (zinc acts as protective layer and sacrificial anode)",
-      "galvanisation prevents corrosion"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "18e. Why are metals like Na, K, Ca and Mg not found free in nature?",
-    acceptableAnswers: [
-      "they are highly reactive and form compounds such as oxides and salts",
-      "they react with substances in nature and do not occur free"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "18f. Why are sodium and potassium stored under kerosene oil?",
-    acceptableAnswers: [
-      "to prevent reaction with moisture and oxygen; to avoid accidental ignition as they react vigorously with air and water",
-      "stored under kerosene to keep them from contacting air/water"
-    ]
-  },
-
-  // 19 - copper extraction (short multi-part)
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "19a. Salt of metal M shows displacement with iron but not with silver. Metal found as sulphide ore 'M2S'. Name metal M.",
-    acceptableAnswers: ["copper", "cu"]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "19b. Which process is suitable for extraction of this metal M from M2S (sulphide ore)?",
-    acceptableAnswers: ["roasting", "roasting of sulphide ore"],
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "19c. Which process is used for obtaining pure metal M and give key equations for electrolytic refining (for copper).",
-    acceptableAnswers: [
-      "electrolytic refining; cu -> cu2+ + 2e- at anode; cu2+ + 2e- -> cu at cathode",
-      "electrolytic refining of copper with copper sulphate solution"
-    ]
-  },
-
-  // 20 - ionic compounds table & properties (short answers)
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "20a. Why do ionic compounds generally have high melting and boiling points?",
-    acceptableAnswers: [
-      "strong electrostatic attraction between oppositely charged ions requires large energy to break",
-      "strong ionic bonds make melting/boiling points high"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "20b. List two important properties of ionic compounds other than high mp/bp.",
-    acceptableAnswers: [
-      "they conduct electricity in molten or aqueous state; many are soluble in water",
-      "soluble in water; conduct electricity when molten/aqueous"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "20c. Give ions present in examples such as NaCl, MgO, LiCl etc. (example answer format: NaCl -> Na+ and Cl-).",
-    acceptableAnswers: [
-      "na+ and cl-; mg2+ and o2-; li+ and cl-",
-      "na+ & cl-, mg2+ & o2-, li+ & cl-"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "20d. Describe briefly an activity to test conductivity of ionic compounds in aqueous solution.",
-    acceptableAnswers: [
-      "set up two electrodes connected to a battery and bulb, insert in solution of salt; bulb lights if conducts because ions carry charge",
-      "use electrodes and battery in salt solution; observation: bulb lights"
-    ]
-  },
-  {
-    chapter: "Metals & Non-metals",
-    type: "short",
-    q: "20e. Can ionic bonds form between two non-metals? Why?",
-    acceptableAnswers: [
-      "no, non-metals generally form covalent bonds as they do not form cations readily",
-      "ionic bond between two non-metals not possible because they do not form positive ions"
-    ]
-  }
-];
- 
+      // Extra practice (mixture across chapters)
+      { chapter:"Chemical Reactions & Equations", type:"mcq", q:"Which reaction type is neutralisation?", options:["Combination","Displacement","Neutralisation","Redox"], answer:2 },
+      { chapter:"Acids, Bases & Salts", type:"short", q:"Which indicator turns pink in a base?", acceptableAnswers:["phenolphthalein"] },
+      { chapter:"Acids, Bases & Salts", type:"mcq", q:"Tooth decay starts when pH of mouth falls below:", options:["7.0","6.5","5.5","4.5"], answer:2 }
+    ];
 
     // STATE
     let questions = [];
@@ -940,6 +882,3 @@ const schoolMetalsQuestions = [
   </script>
 </body>
 </html>
-
-
-
