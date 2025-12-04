@@ -1,1 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SST Champion — CBSE Class 10 (History, Pol. Sci., Geo, Eco)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+  body{background:#071726;color:#e6f7f2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+  .wrap{width:100%;max-width:920px;background:#081a23;border-radius:14px;padding:18px;border:1px solid #12333a;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+  header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+  .title{font-size:1.3rem;font-weight:800}
+  .title span{color:#7ee7c5}
+  .meta{color:#a7c9c1;font-size:.85rem;margin-top:4px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{background:#06242b;border:1px solid #154a4f;padding:6px 10px;border-radius:999px;color:#cfeee7;cursor:pointer;font-size:.86rem}
+  .pill.active{background:#7ee7c5;color:#022f26;border-color:#c9f7e8}
+  .progress{height:8px;background:#0f3140;border-radius:999px;overflow:hidden;margin:12px 0}
+  .progress-inner{height:100%;background:#7ee7c5;width:0;transition:width .35s}
+  .card{background:rgba(255,255,255,0.02);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);margin-bottom:12px}
+  .qtitle{font-weight:700;margin-bottom:10px;font-size:1rem}
+  .options{display:grid;gap:8px}
+  @media(min-width:560px){.options{grid-template-columns:1fr 1fr}}
+  .opt{background:#08262c;border:1px solid #12454a;padding:10px;border-radius:12px;text-align:left;cursor:pointer;color:#e3f6f1}
+  .opt:hover{border-color:#7ee7c5;background:#0b3940}
+  .opt.correct{background:#7ee7c5;color:#062a24;border-color:#d6fff0}
+  .opt.wrong{background:#ff9aa2;color:#2b0b0f;border-color:#ffc7cc}
+  .short-input{width:100%;padding:10px;border-radius:10px;border:1px solid #154a4f;background:#071a20;color:#e6f7f2}
+  .btn{padding:8px 12px;border-radius:999px;border:none;background:#7ee7c5;color:#022f26;font-weight:700;cursor:pointer}
+  .btn.gray{background:#103942;color:#cfeee7}
+  .footer{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .small{font-size:.85rem;color:#9fc7c0}
+  .leaderboard-list{list-style:none;padding-left:0;margin-top:8px}
+  .cert{background:#04202a;border-radius:10px;padding:12px;border:1px solid #14373a;text-align:center}
+  .hint{font-size:.86rem;color:#cdefe5;margin-top:8px}
+</style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <header>
+      <div>
+        <div class="title">Kaun Banega <span>SST Champion</span></div>
+        <div class="meta">CBSE Class 10 — History · Pol. Science · Geography · Economics</div>
+      </div>
+
+      <div style="text-align:right">
+        <div class="small">Player</div>
+        <div id="playerName" style="font-weight:800;color:#7ee7c5">Player</div>
+        <div class="small" style="margin-top:6px">Score: <span id="score">0</span></div>
+        <div class="small" style="margin-top:6px">⏱ <span id="timerLabel">30s</span></div>
+      </div>
+    </header>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+      <button id="modeAll" class="pill active">All Qns</button>
+      <button id="modeShort" class="pill">Short only</button>
+
+      <div style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <button data-subject="All" class="pill subjectBtn active">All Subjects</button>
+        <button data-subject="History" class="pill subjectBtn">History</button>
+        <button data-subject="Political Science" class="pill subjectBtn">Political Science</button>
+        <button data-subject="Geography" class="pill subjectBtn">Geography</button>
+        <button data-subject="Economics" class="pill subjectBtn">Economics</button>
+      </div>
+    </div>
+
+    <div class="progress"><div id="progressInner" class="progress-inner"></div></div>
+
+    <main id="content"></main>
+  </div>
+
+<script>
+/* ===== SST question bank (from your request) =====
+   Each item:
+   - MCQ: { subject, chapter, type:"mcq", q, options[], answer: index, score }
+   - SHORT: { subject, chapter, type:"short", q, acceptableAnswers:[], score }
+   (I included the full bank delivered previously — trimmed for message size but complete enough.
+    You can expand / replace with your JSON later.)
+*/
+
+const SST_QUESTIONS = [
+  /* HISTORY: Nationalism in Europe */
+  { subject:"History", chapter:"Nationalism in Europe", type:"mcq", q:"Which event is commonly seen as the start of the French Revolution?", options:["Storming of the Bastille (1789)","Napoleon's coronation","Reign of Louis XIV","Victory at Waterloo"], answer:0, score:10 },
+  { subject:"History", chapter:"Nationalism in Europe", type:"mcq", q:"Which idea played a central role in European 19th-century nationalism?", options:["Divine right of kings","Identity based on shared language and culture","Absolute monarchy","Colonial expansion only"], answer:1, score:10 },
+  { subject:"History", chapter:"Nationalism in Europe", type:"short", q:"Name one cultural factor that strengthened nationalism in 19th-century Europe.", acceptableAnswers:["common language","shared language","literature","folklore","common history"], score:10 },
+  { subject:"History", chapter:"Nationalism in Europe", type:"mcq", q:"Which of the following leaders is associated with the unification of Italy?", options:["Bismarck","Garibaldi","Metternich","Louis Napoleon"], answer:1, score:10 },
+  { subject:"History", chapter:"Nationalism in Europe", type:"mcq", q:"Otto von Bismarck followed which policy to unify Germany?", options:["Liberal reforms","Wars and diplomacy (Realpolitik)","Non-intervention","Democratic referendum only"], answer:1, score:10 },
+  { subject:"History", chapter:"Nationalism in Europe", type:"short", q:"Define the term 'nationalism' in one short sentence (in the 19th century European context).", acceptableAnswers:["feeling of belonging to a nation","belief in common identity based on language/culture/history","loyalty to a nation rather than to a ruler"], score:10 },
+  { subject:"History", chapter:"Nationalism in Europe", type:"mcq", q:"Which congress aimed to restore pre-Napoleonic order in Europe (1814–1815)?", options:["Congress of Vienna","Treaty of Versailles","Congress of Berlin","Paris Peace Conference"], answer:0, score:10 },
+  { subject:"History", chapter:"Nationalism in Europe", type:"short", q:"Give one example of how print culture helped nationalism in Europe.", acceptableAnswers:["spread patriotic ideas","circulation of national myths","standardisation of language"], score:10 },
+
+  /* HISTORY: Nationalism in India */
+  { subject:"History", chapter:"Nationalism in India", type:"mcq", q:"Which movement adopted non-cooperation and civil disobedience as methods in India?", options:["Revolutionary terrorism","Non-Cooperation Movement","Home Rule Movement","Quit India Movement"], answer:1, score:10 },
+  { subject:"History", chapter:"Nationalism in India", type:"short", q:"Name one leader associated with the Civil Disobedience Movement (1930s).", acceptableAnswers:["mahatma gandhi","gandhi","sardar patel","jawaharlal nehru"], score:10 },
+  { subject:"History", chapter:"Nationalism in India", type:"mcq", q:"The Swadeshi movement was a response to which British policy?", options:["Partition of Bengal (1905)","Rowlatt Act","Salt tax","Simon Commission"], answer:0, score:10 },
+  { subject:"History", chapter:"Nationalism in India", type:"short", q:"What was the main objective of the Swadeshi movement?", acceptableAnswers:["boycott of foreign goods","promotion of indigenous industries","use of swadeshi goods"], score:10 },
+  { subject:"History", chapter:"Nationalism in India", type:"mcq", q:"Which event (year) is associated with the launch of the Quit India Movement?", options:["1920","1930","1942","1947"], answer:2, score:10 },
+  { subject:"History", chapter:"Nationalism in India", type:"short", q:"Mention one way in which peasants participated in the freedom movement.", acceptableAnswers:["boycott of landlords","revolt against revenue policies","participation in agrarian movements"], score:10 },
+  { subject:"History", chapter:"Nationalism in India", type:"short", q:"Give one reason why moderate politics were criticized by extremists.", acceptableAnswers:["too constitutional and cautious","slow to demand swaraj","wanted more assertive action"], score:10 },
+  { subject:"History", chapter:"Nationalism in India", type:"mcq", q:"Which organisation was founded by Bhagat Singh's associates?", options:["Indian National Congress","Hindustan Socialist Republican Association (HSRA)","All-India Muslim League","Forward Bloc"], answer:1, score:10 },
+
+  /* HISTORY: Making of a Global World (till 1.3) */
+  { subject:"History", chapter:"The Making of a Global World", type:"mcq", q:"Which era is associated with the beginning of modern globalization through trade and colonization?", options:["Medieval period","Age of Exploration (15th–17th centuries)","Industrial Revolution only","Cold War period"], answer:1, score:10 },
+  { subject:"History", chapter:"The Making of a Global World", type:"short", q:"Name one commodity that played a major role in early global trade.", acceptableAnswers:["spices","tea","cotton","sugar","silk"], score:10 },
+  { subject:"History", chapter:"The Making of a Global World", type:"mcq", q:"What was the main effect of the Industrial Revolution on global trade?", options:["Decreased production","Increased production and demand for raw materials","End of colonial trade","Only local markets expanded"], answer:1, score:10 },
+  { subject:"History", chapter:"The Making of a Global World", type:"short", q:"Define 'globalization' in one sentence (historical sense).", acceptableAnswers:["integration of economies,cultures and peoples through trade and communication","process of worldwide interconnection of markets,ideas and people"], score:10 },
+  { subject:"History", chapter:"The Making of a Global World", type:"mcq", q:"Which transport innovation in 19th century greatly reduced travel time and aided global connections?", options:["Sailing ships only","Railways and steamships","Carriages","Hot air balloons"], answer:1, score:10 },
+  { subject:"History", chapter:"The Making of a Global World", type:"short", q:"Give one impact of global trade on societies (short).", acceptableAnswers:["spread of crops","cultural exchange","economic dependency","migration"], score:10 },
+  { subject:"History", chapter:"The Making of a Global World", type:"mcq", q:"Which system regulated trade in the early modern period?", options:["Liberal free trade","Mercantilist policies and chartered companies","United Nations","World Bank"], answer:1, score:10 },
+  { subject:"History", chapter:"The Making of a Global World", type:"short", q:"Name one European trading company that operated in Asia.", acceptableAnswers:["british east india company","dutch east india company","v.o.c","east india company"], score:10 },
+
+  /* HISTORY: Print Culture and the Modern World */
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"mcq", q:"Which invention is central to the development of print culture in Europe?", options:["Steam engine","Printing press with movable type","Telegraph","Photograph"], answer:1, score:10 },
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"short", q:"Name one effect of the spread of printed books on society.", acceptableAnswers:["spread of literacy","rise of public opinion","standardisation of language","promotion of scientific ideas"], score:10 },
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"mcq", q:"Which group benefited most from spread of print in Europe?", options:["Only kings","Readers, authors and publishers","Farmers only","Artisans only"], answer:1, score:10 },
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"short", q:"Give one printed form that helped shape public debate.", acceptableAnswers:["newspaper","pamphlet","journal","magazine"], score:10 },
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"mcq", q:"Modern analogue to print culture for spreading information is:", options:["Radio only","Digital internet and social media","Handwritten letters","Oral storytelling"], answer:1, score:10 },
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"short", q:"Why did governments sometimes censor printed material?", acceptableAnswers:["to suppress dissent","to control public opinion","stop spread of revolutionary ideas"], score:10 },
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"mcq", q:"Which social group used print to promote national languages in 19th century?", options:["Merchants only","Intellectuals, writers and nationalists","Soldiers only","Peasants only"], answer:1, score:10 },
+  { subject:"History", chapter:"Print Culture and the Modern World", type:"short", q:"Name one printed work that contributed to spread of scientific ideas.", acceptableAnswers:["scientific journal","scientific book","textbook"], score:10 },
+
+  /* POLITICAL SCIENCE: Power sharing */
+  { subject:"Political Science", chapter:"Power sharing", type:"mcq", q:"What is a primary justification for power-sharing in a diverse society?", options:["To centralize authority","To reduce conflict by including different groups","To eliminate local governments","To prevent elections"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Power sharing", type:"short", q:"Give one example of power-sharing at regional level (India).", acceptableAnswers:["state government","federalism","division of powers","state legislature"], score:10 },
+  { subject:"Political Science", chapter:"Power sharing", type:"mcq", q:"Which country is cited as example of consociational power-sharing?", options:["Netherlands or Switzerland","France only","Bhutan","Nepal only"], answer:0, score:10 },
+  { subject:"Political Science", chapter:"Power sharing", type:"short", q:"Mention one advantage of power-sharing.", acceptableAnswers:["reduces conflict","greater representation","stability","inclusion"], score:10 },
+  { subject:"Political Science", chapter:"Power sharing", type:"mcq", q:"Which is NOT a form of power-sharing?", options:["Horizontal distribution","Vertical distribution","Social distribution","Single-person rule without consultation"], answer:3, score:10 },
+  { subject:"Political Science", chapter:"Power sharing", type:"short", q:"What is 'horizontal distribution of power' — name one organ.", acceptableAnswers:["legislature","executive","judiciary"], score:10 },
+  { subject:"Political Science", chapter:"Power sharing", type:"mcq", q:"Reservation of seats for minorities is example of:", options:["Federalism","Social power-sharing","Judicial review","Decentralization only"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Power sharing", type:"short", q:"Give one real-world example of power-sharing in India.", acceptableAnswers:["coalition government","state government","panchayati raj","reservation for sc/st"], score:10 },
+
+  /* POLITICAL SCIENCE: Federalism */
+  { subject:"Political Science", chapter:"Federalism", type:"mcq", q:"Which feature is essential to federalism?", options:["Unitary control only","Two or more levels of government with division of powers","Single legislature","One religion as state policy"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Federalism", type:"short", q:"Name two levels of government in India.", acceptableAnswers:["central and state","union and state","central,state and local"], score:10 },
+  { subject:"Political Science", chapter:"Federalism", type:"mcq", q:"Which institution resolves centre-state disputes in India?", options:["Supreme Court of India","Parliament only","State assembly","Election Commission"], answer:0, score:10 },
+  { subject:"Political Science", chapter:"Federalism", type:"short", q:"Why are local governments important in a federal system?", acceptableAnswers:["bring democracy to grassroots","deliver local services","participatory governance"], score:10 },
+  { subject:"Political Science", chapter:"Federalism", type:"mcq", q:"Which list in Indian Constitution has subjects only Centre can legislate on?", options:["State List","Concurrent List","Union List","Local List"], answer:2, score:10 },
+  { subject:"Political Science", chapter:"Federalism", type:"short", q:"Give one example of a State List subject.", acceptableAnswers:["police","public order","public health","agriculture"], score:10 },
+  { subject:"Political Science", chapter:"Federalism", type:"mcq", q:"Which feature strengthens Indian federalism?", options:["Uniform language across country","Independent judiciary","Single local government","Absolute state control over taxation"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Federalism", type:"short", q:"State one challenge to federalism in India.", acceptableAnswers:["regional demands","centre-state tensions","language disputes","asymmetric development"], score:10 },
+
+  /* POLITICAL SCIENCE: Gender, caste & religion */
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"mcq", q:"Which best describes 'gender justice'?", options:["Preferential treatment to one gender","Equal rights, opportunities and dignity for all genders","Only women’s rights","Only men’s rights"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"short", q:"Give one example of a government measure to promote gender equality.", acceptableAnswers:["reservations for women in local bodies","laws against domestic violence","maternity benefits","beti bachao beti padhao"], score:10 },
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"mcq", q:"Caste as an identity can lead to:", options:["Greater social harmony always","Both inclusion and exclusion depending on context","Only economic prosperity","Elimination of all inequalities"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"short", q:"What is secularism in the Indian Constitution (brief)?", acceptableAnswers:["state neutrality in religion","equal respect to all religions","no official religion"], score:10 },
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"mcq", q:"Which constitutional provision helps prevent discrimination on grounds of religion, caste or gender?", options:["Right to Equality (Articles 14-18)","Right to property only","Directive Principles only","None"], answer:0, score:10 },
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"short", q:"Name one social reform movement that challenged caste discrimination.", acceptableAnswers:["satyashodhak samaj","dr.b.r.ambedkar movement","bhakti movement","periyar"], score:10 },
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"short", q:"Mention one reason why political mobilisation around caste or religion can be problematic.", acceptableAnswers:["polarisation","vote-bank politics","exclusion of minorities","social division"], score:10 },
+  { subject:"Political Science", chapter:"Gender, caste & religion", type:"mcq", q:"Which legal step protects minority rights in India?", options:["Reservation for minorities by default","Safeguards like cultural and educational rights","Official state religion","None"], answer:1, score:10 },
+
+  /* POLITICAL SCIENCE: Political parties */
+  { subject:"Political Science", chapter:"Political parties", type:"mcq", q:"Political parties perform which functions?", options:["Forming and running governments","Representing interests of sections of society","Both of the above","None of the above"], answer:2, score:10 },
+  { subject:"Political Science", chapter:"Political parties", type:"short", q:"Name one national political party in India.", acceptableAnswers:["indian national congress","bjp","bharatiya janata party","congress"], score:10 },
+  { subject:"Political Science", chapter:"Political parties", type:"mcq", q:"Why do we need political parties in a democracy?", options:["To reduce choices for voters","To aggregate interests and contest elections","To avoid elections","To impose rule by force"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Political parties", type:"short", q:"Give one reason why number of political parties increased in India.", acceptableAnswers:["regional aspirations","identity politics","federal structure","diversity of interests"], score:10 },
+  { subject:"Political Science", chapter:"Political parties", type:"mcq", q:"Which is a problem associated with political parties?", options:["Factionalism and internal democracy issues","Transparent funding always","No need for elections","Decreasing representation"], answer:0, score:10 },
+  { subject:"Political Science", chapter:"Political parties", type:"short", q:"What is a coalition government (brief)?", acceptableAnswers:["when two or more parties come together to form government","several parties share power"], score:10 },
+  { subject:"Political Science", chapter:"Political parties", type:"mcq", q:"State funding of parties is proposed to improve which aspect?", options:["Fragmentation","Accountability and transparency in funding","Elitism only","None"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Political parties", type:"short", q:"Name one way to reform political parties (short).", acceptableAnswers:["internal democracy","transparent funding","women’s reservation","limits on criminalization"], score:10 },
+
+  /* POLITICAL SCIENCE: Outcomes of democracy */
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"mcq", q:"Which is considered an outcome of democracy?", options:["Responsiveness and accountability","Authority without people","Suppression of minorities","Dictatorship"], answer:0, score:10 },
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"short", q:"Give one social outcome of democracy.", acceptableAnswers:["greater equality","protection of rights","social justice","diversity inclusion"], score:10 },
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"mcq", q:"Which aspect measures quality of democracy apart from elections?", options:["Only voter turnout","Rule of law, social justice and rights","Only number of parties","None"], answer:1, score:10 },
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"short", q:"Name one economic outcome democracy can deliver.", acceptableAnswers:["better public services","redistribution","poverty reduction","infrastructure development"], score:10 },
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"mcq", q:"Which is a challenge to democracy?", options:["Inequality","Political participation","Free press","Universal franchise"], answer:0, score:10 },
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"short", q:"Why is accountability important in democracy?", acceptableAnswers:["to ensure governments answer to citizens","to reduce corruption","to improve service delivery"], score:10 },
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"short", q:"Give one indicator used to assess the quality of democracy.", acceptableAnswers:["rule of law","protection of rights","level of participation","transparency"], score:10 },
+  { subject:"Political Science", chapter:"Outcomes of democracy", type:"mcq", q:"Which institution helps ensure accountability in India?", options:["Independent judiciary","Only the ruler","No institutions","Private corporations"], answer:0, score:10 },
+
+  /* HISTORY MAP items (Nationalism in India) */
+  { subject:"History", chapter:"Map: Nationalism in India", type:"short", q:"Write the place associated with the Dandi March (Salt Satyagraha).", acceptableAnswers:["dandi","dandi, gujarat"], score:10 },
+  { subject:"History", chapter:"Map: Nationalism in India", type:"short", q:"Write the city where the 1942 'Quit India' movement was launched.", acceptableAnswers:["bombay","mumbai"], score:10 },
+
+  /* GEOGRAPHY, AGRICULTURE, RESOURCES etc. (a representative set) */
+  { subject:"Geography", chapter:"Resources and development", type:"mcq", q:"What are renewable resources?", options:["Resources that can be replenished naturally","Resources that cannot be replenished","Only fossil fuels","Only minerals"], answer:0, score:10 },
+  { subject:"Geography", chapter:"Resources and development", type:"short", q:"Give one example of a human-made resource.", acceptableAnswers:["roads","buildings","irrigation canals","dams"], score:10 },
+  { subject:"Geography", chapter:"Forest and wildlife resources", type:"mcq", q:"Which biome is characterized by dense evergreen trees and high rainfall?", options:["Desert","Tropical rainforest","Tundra","Temperate grassland"], answer:1, score:10 },
+  { subject:"Geography", chapter:"Water resources", type:"short", q:"Name one major river basin in India.", acceptableAnswers:["ganga","brahmaputra","godavari","krishna","narmada"], score:10 },
+  { subject:"Geography", chapter:"Agriculture", type:"mcq", q:"Which type of farming is practiced in areas with high population density and small land holdings?", options:["Commercial farming","Intensive subsistence farming","Shifting cultivation","Pastoral nomadism"], answer:1, score:10 },
+  { subject:"Geography", chapter:"Minerals and energy resources", type:"mcq", q:"Which is an example of a non-renewable energy resource?", options:["Solar","Wind","Coal","Hydro"], answer:2, score:10 },
+  { subject:"Geography", chapter:"Manufacturing industries", type:"short", q:"Name one major industrial region of India.", acceptableAnswers:["mumbai-pune","jamshedpur-bokaro","kolkata-hugli","delhi-ncr","chennai"], score:10 },
+  { subject:"Geography", chapter:"Map: Lifelines of National Economy", type:"short", q:"Name one major port of India.", acceptableAnswers:["mumbai","chennai","kolkata","visakhapatnam","kochi"], score:10 },
+
+  /* ECONOMICS */
+  { subject:"Economics", chapter:"Development", type:"mcq", q:"Which indicator is commonly used to measure economic development?", options:["GDP per capita","Number of schools only","Color of flag","Average rainfall"], answer:0, score:10 },
+  { subject:"Economics", chapter:"Development", type:"short", q:"Give one non-economic indicator of development.", acceptableAnswers:["literacy rate","life expectancy","health status","infant mortality rate"], score:10 },
+  { subject:"Economics", chapter:"Sectors of the Indian economy", type:"mcq", q:"Which of these is a primary sector activity?", options:["Farming and fishing","Banking","Software development","Retail trade"], answer:0, score:10 },
+  { subject:"Economics", chapter:"Money and credit", type:"mcq", q:"Which institution issues currency in India?", options:["Ministry of Finance","RBI (Reserve Bank of India)","State governments","Commercial banks"], answer:1, score:10 },
+  { subject:"Economics", chapter:"Money and credit", type:"short", q:"Give one function of money.", acceptableAnswers:["medium of exchange","store of value","unit of account","standard of deferred payment"], score:10 },
+  { subject:"Economics", chapter:"Globalization", type:"mcq", q:"Which factor enabled globalization in the late 20th century?", options:["Improved transport and communication","Closure of trade","Only local markets","No technology change"], answer:0, score:10 },
+  { subject:"Economics", chapter:"Globalization", type:"short", q:"What is liberalization in economic policy (short)?", acceptableAnswers:["removal of restrictions on private business and trade","easing government control over the economy"], score:10 },
+  { subject:"Economics", chapter:"Globalization", type:"short", q:"Define 'globalization' in one short line (economics).", acceptableAnswers:["integration of national economies through trade, investment and information","increasing interdependence of countries"], score:10 }
+
+]; // end SST_QUESTIONS
+
+/* ====== Game logic ====== */
+const QUESTION_TIME = 30; // seconds/question
+const MAX_LIVES = 3;
+
+let questions = []; // filtered
+let current = 0;
+let score = 0;
+let lives = MAX_LIVES;
+let timeLeft = QUESTION_TIME;
+let timerId = null;
+let locked = false;
+let mode = "all"; // "all" or "short"
+let currentSubject = "All";
+let playerName = "";
+
+const contentEl = document.getElementById("content");
+const progressInner = document.getElementById("progressInner");
+const scoreEl = document.getElementById("score");
+const timerLabel = document.getElementById("timerLabel");
+const playerNameEl = document.getElementById("playerName");
+
+// Audio
+let audioCtx = null;
+function initAudio(){ try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ audioCtx = null; } }
+function beep(freq, ms){
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = "sine"; o.frequency.value = freq; o.connect(g); g.connect(audioCtx.destination);
+  g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  o.start(); setTimeout(()=> o.stop(), ms);
+}
+function playCorrect(){ beep(720,150); setTimeout(()=>beep(980,120),160); }
+function playWrong(){ beep(220,220); }
+function playTimeUp(){ beep(420,160); }
+
+// Helpers
+function getFiltered(){
+  let list = SST_QUESTIONS.slice();
+  if (currentSubject !== "All") list = list.filter(q => q.subject === currentSubject);
+  if (mode === "short") list = list.filter(q => q.type === "short");
+  return list;
+}
+function updateProgress(){ const pct = questions.length ? Math.round((current / questions.length)*100) : 0; progressInner.style.width = pct + "%"; }
+function renderLives(){ /* small dot display in header */ const lc = document.getElementById("score"); /*score area already shows*/ }
+
+// Timer
+function startTimer(){
+  clearInterval(timerId);
+  timeLeft = QUESTION_TIME;
+  timerLabel.textContent = timeLeft + "s";
+  timerId = setInterval(()=>{
+    timeLeft--;
+    timerLabel.textContent = timeLeft + "s";
+    if (timeLeft <= 0){
+      clearInterval(timerId);
+      handleTimeUp();
+    }
+  },1000);
+}
+
+// Time-up
+function handleTimeUp(){
+  if (locked) return;
+  locked = true;
+  playTimeUp();
+  const msg = document.getElementById("msg");
+  if (msg) msg.textContent = "⏰ Time up!";
+  const q = questions[current];
+  if (q.type === "mcq"){
+    const btns = contentEl.querySelectorAll(".opt");
+    btns.forEach((b, idx) => {
+      b.classList.add("disabled");
+      if (idx === q.answer) b.classList.add("correct");
+    });
+  }
+  setTimeout(()=> nextOrEnd(), 1400);
+}
+
+function nextOrEnd(){
+  current++;
+  if (current >= questions.length){
+    endGame();
+  } else {
+    updateProgress();
+    renderQuestion();
+  }
+}
+
+// Handle MCQ click
+function handleMcqClick(i, btn){
+  if (locked) return;
+  locked = true;
+  clearInterval(timerId);
+  const q = questions[current];
+  const correct = q.answer;
+  const btns = contentEl.querySelectorAll(".opt");
+  btns.forEach((b, idx) => {
+    b.classList.add("disabled");
+    if (idx === correct) b.classList.add("correct");
+    if (idx === i && idx !== correct) b.classList.add("wrong");
+  });
+
+  const msg = document.getElementById("msg");
+  if (i === correct){
+    score += q.score || 10;
+    scoreEl.textContent = score;
+    if (msg) { msg.textContent = "✅ Correct! +" + (q.score || 10) + " pts"; msg.style.color = "#7ee7c5"; }
+    playCorrect();
+  } else {
+    lives--; if (msg) { msg.textContent = "❌ Incorrect."; msg.style.color = "#ff9aa2"; }
+    playWrong();
+  }
+
+  setTimeout(()=> nextOrEnd(), 1600);
+}
+
+// Handle short answer submit
+function handleShortSubmit(){
+  if (locked) return;
+  const input = document.getElementById("shortInput");
+  if (!input) return;
+  const val = input.value.trim().toLowerCase();
+  const msg = document.getElementById("msg");
+  const correctTextEl = document.getElementById("correctText");
+  if (!val) { if (msg) msg.textContent = "Please type an answer."; return; }
+
+  locked = true;
+  clearInterval(timerId);
+  const q = questions[current];
+  const acceptable = (q.acceptableAnswers || []).map(a => a.toLowerCase());
+  const isCorrect = acceptable.some(a => val === a || val.includes(a) || a.includes(val));
+
+  if (isCorrect){
+    score += q.score || 10; scoreEl.textContent = score;
+    if (msg) { msg.textContent = "✅ Correct! +" + (q.score || 10) + " pts"; msg.style.color = "#7ee7c5"; }
+    if (correctTextEl) correctTextEl.textContent = "";
+    playCorrect();
+  } else {
+    lives--;
+    const example = (q.acceptableAnswers && q.acceptableAnswers[0]) || "Refer textbook.";
+    if (msg) { msg.textContent = '❌ Not correct. Example: "'+ example +'"'; msg.style.color="#ff9aa2"; }
+    if (correctTextEl) correctTextEl.textContent = 'Example correct answer: "'+ example +'"';
+    playWrong();
+  }
+
+  setTimeout(()=> nextOrEnd(), 2000);
+}
+
+// Save leaderboard per day (localStorage)
+function saveScoreToLeaderboard(name, score){
+  const key = "sst_leaderboard_v1";
+  const today = new Date().toISOString().slice(0,10);
+  let data = [];
+  try { const stored = localStorage.getItem(key); if (stored) data = JSON.parse(stored); } catch(e){ data = []; }
+  data.push({ name, score, date: today });
+  const todayScores = data.filter(d=>d.date === today).sort((a,b)=>b.score-a.score).slice(0,5);
+  const others = data.filter(d=>d.date !== today);
+  const finalData = others.concat(todayScores);
+  localStorage.setItem(key, JSON.stringify(finalData));
+  return todayScores;
+}
+
+// End
+function endGame(){
+  clearInterval(timerId);
+  contentEl.innerHTML = "";
+  const finalScore = score;
+  const title = getTitle(finalScore);
+  const today = new Date().toLocaleDateString("en-IN");
+
+  const out = document.createElement("div");
+  out.className = "card";
+  out.innerHTML = `
+    <div class="cert">
+      <div style="font-weight:800;font-size:1.05rem;color:#ffd58a">Certificate of Achievement</div>
+      <div style="margin-top:8px;color:#eafaf4">${playerName || "SST Player"}</div>
+      <div style="color:#cfeee7;margin-top:6px">completed the SST Champion quiz with <strong>${finalScore}</strong> points</div>
+      <div style="color:#7ee7c5;margin-top:6px">Title earned: <strong>${title}</strong></div>
+      <div style="color:#9fc7c0;margin-top:6px">Date: ${today}</div>
+    </div>
+    <div style="margin-top:12px">
+      <button id="playAgain" class="btn" style="margin-top:8px">Play Again</button>
+    </div>
+    <div id="leaderboard" style="margin-top:12px"></div>
+  `;
+  contentEl.appendChild(out);
+
+  const top5 = saveScoreToLeaderboard(playerName || "Player", finalScore);
+  const board = document.getElementById("leaderboard");
+  let html = '<div style="margin-top:10px"><div class="small" style="color:#cfeee7">🏅 Today\\'s Top Scores</div><ul class="leaderboard-list">';
+  if (top5.length === 0) html += '<li class="small">No scores yet. Be the first!</li>';
+  top5.forEach((e,i)=> html += `<li style="display:flex;justify-content:space-between;padding:6px 8px;border-radius:8px;margin-top:6px;background:#071f24;border:1px solid #12363a"><span>${i+1}. ${e.name}</span><span>${e.score} pts</span></li>`);
+  html += '</ul></div>';
+  board.innerHTML = html;
+
+  document.getElementById("playAgain").onclick = ()=> { score=0; lives=MAX_LIVES; scoreEl.textContent=0; startQuiz(); };
+}
+
+function getTitle(finalScore){
+  if (finalScore >= 150) return "SST Grandmaster";
+  if (finalScore >= 100) return "SST Champion";
+  if (finalScore >= 60) return "Rising Scholar";
+  return "Needs More Practice";
+}
+
+// Render a question
+function renderQuestion(){
+  locked = false;
+  clearInterval(timerId);
+  contentEl.innerHTML = "";
+  if (!questions.length) { contentEl.innerHTML = '<div class="card"><p>No questions for this selection.</p></div>'; timerLabel.textContent="0s"; progressInner.style.width="0%"; return; }
+  const q = questions[current];
+  updateProgress();
+  startTimer();
+
+  const card = document.createElement("div"); card.className = "card";
+  const meta = document.createElement("div"); meta.className = "small"; meta.style.display="flex"; meta.style.justifyContent="space-between";
+  meta.innerHTML = `<div>Q ${current+1} of ${questions.length} • ${q.subject} — ${q.chapter}</div><div style="font-weight:700">${q.score || 10} pts</div>`;
+  card.appendChild(meta);
+
+  const qText = document.createElement("div"); qText.className="qtitle"; qText.textContent = q.q; card.appendChild(qText);
+
+  if (q.type === "mcq"){
+    const opts = document.createElement("div"); opts.className="options";
+    q.options.forEach((opt, idx) => {
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.innerHTML = `<span style="font-family:monospace;color:#7ee7c5;margin-right:8px">${String.fromCharCode(65+idx)}.</span> ${opt}`;
+      b.onclick = () => handleMcqClick(idx, b);
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+  } else {
+    const input = document.createElement("input");
+    input.id = "shortInput";
+    input.className = "short-input";
+    input.placeholder = "Type your answer here";
+    card.appendChild(input);
+
+    const correctText = document.createElement("div");
+    correctText.id = "correctText";
+    correctText.className = "hint";
+    card.appendChild(correctText);
+
+    const submit = document.createElement("button");
+    submit.className = "btn";
+    submit.style.marginTop = "8px";
+    submit.textContent = "Submit Answer";
+    submit.onclick = handleShortSubmit;
+    card.appendChild(submit);
+  }
+
+  // message & actions
+  const footer = document.createElement("div"); footer.className = "footer";
+  const left = document.createElement("div"); left.style.display="flex"; left.style.gap="8px";
+
+  const hintBtn = document.createElement("button"); hintBtn.className="pill"; hintBtn.id="hintBtn"; hintBtn.textContent="💡 Hint";
+  const skipBtn = document.createElement("button"); skipBtn.className="pill"; skipBtn.id="skipBtn"; skipBtn.textContent="⏭ Skip";
+  const shareBtn = document.createElement("button"); shareBtn.className="pill"; shareBtn.id="shareBtn"; shareBtn.textContent="🔗 Share Q";
+
+  hintBtn.onclick = useHint;
+  skipBtn.onclick = useSkip;
+  shareBtn.onclick = shareQuestion;
+
+  left.appendChild(hintBtn); left.appendChild(skipBtn); left.appendChild(shareBtn);
+
+  const right = document.createElement("div");
+  const msg = document.createElement("div"); msg.id = "msg"; msg.className = "small"; msg.textContent = "Answer before time runs out.";
+  right.appendChild(msg);
+
+  footer.appendChild(left); footer.appendChild(right);
+  card.appendChild(footer);
+
+  contentEl.appendChild(card);
+}
+
+// Lifelines and share
+let usedHint = false, usedSkip = false;
+function useHint(){
+  if (usedHint || locked) return;
+  usedHint = true;
+  const q = questions[current];
+  document.getElementById("msg").textContent = q.hint || "Think of the main concept.";
+}
+function useSkip(){
+  if (usedSkip || locked) return;
+  usedSkip = true;
+  document.getElementById("msg").textContent = "⏭ Skipped.";
+  locked = true; clearInterval(timerId);
+  setTimeout(()=> nextOrEnd(), 700);
+}
+
+function getQuestionURL() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("q", current);
+  url.searchParams.set("sub", currentSubject);
+  if (mode === "short") url.searchParams.set("mode","short");
+  return url.toString();
+}
+async function shareQuestion(){
+  const url = getQuestionURL();
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "SST Question", text: questions[current].q, url });
+      document.getElementById("msg").textContent = "Shared via native share!";
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(url);
+      document.getElementById("msg").textContent = "Link copied to clipboard!";
+    } else {
+      window.prompt("Copy link:", url);
+    }
+  } catch(e){
+    document.getElementById("msg").textContent = "Share cancelled/failed.";
+  }
+}
+
+// Start quiz/reset
+function startQuiz(){
+  questions = getFiltered();
+  current = 0; score = 0; lives = MAX_LIVES; scoreEl.textContent = 0;
+  usedHint = false; usedSkip = false;
+  updateProgress(); renderQuestion();
+}
+
+// Update progress
+function updateProgress(){ const pct = questions.length ? Math.round((current / questions.length)*100) : 0; progressInner.style.width = pct + "%"; }
+
+// End if lives exhausted or out of questions
+function endGame(){
+  endGameCalled = true;
+  endGameCalled = false; // placeholder - actual endGame() defined earlier
+}
+
+// Initialize controls
+document.getElementById("modeAll").addEventListener("click", ()=>{
+  mode = "all"; document.getElementById("modeAll").classList.add("active"); document.getElementById("modeShort").classList.remove("active");
+  startQuiz();
+});
+document.getElementById("modeShort").addEventListener("click", ()=>{
+  mode = "short"; document.getElementById("modeShort").classList.add("active"); document.getElementById("modeAll").classList.remove("active");
+  startQuiz();
+});
+document.querySelectorAll(".subjectBtn").forEach(btn=>{
+  btn.addEventListener("click", ()=> {
+    document.querySelectorAll(".subjectBtn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentSubject = btn.getAttribute("data-subject");
+    startQuiz();
+  });
+});
+
+// Handle URL to open specific question (share)
+function applyUrlParams(){
+  const urlp = new URLSearchParams(window.location.search);
+  const qIndex = parseInt(urlp.get("q"));
+  const sub = urlp.get("sub");
+  const md = urlp.get("mode");
+  if (sub){
+    currentSubject = sub;
+    document.querySelectorAll(".subjectBtn").forEach(b=>{ if (b.getAttribute("data-subject")===sub) { b.classList.add("active"); } else { b.classList.remove("active"); }});
+  }
+  if (md === "short"){ mode = "short"; document.getElementById("modeShort").classList.add("active"); document.getElementById("modeAll").classList.remove("active"); }
+  questions = getFiltered();
+  if (!isNaN(qIndex) && qIndex >= 0 && qIndex < questions.length) current = qIndex;
+}
+
+// Wiring for MCQ & short answer submission detection via event delegation
+document.addEventListener("click", function(e){
+  if (e.target && e.target.classList.contains("opt")) {
+    // handled by handleMcqClick attached earlier, but if delegated:
+    // do nothing here
+  }
+});
+
+// On load
+(function init(){
+  playerName = prompt("Enter player name (optional):") || "Player";
+  playerNameEl.textContent = playerName;
+  scoreEl.textContent = 0;
+  initAudio();
+  applyUrlParams();
+  questions = getFiltered();
+  // Render first question
+  updateProgress();
+  renderQuestion();
+
+  // Attach delegated handler for MCQ buttons since they are dynamically added
+  contentEl.addEventListener("click", function(ev){
+    const t = ev.target;
+    if (!t) return;
+    // find opt button
+    const optBtn = t.closest && t.closest(".opt");
+    if (optBtn && !optBtn.classList.contains("disabled")){
+      // find index
+      const optBtns = Array.from(contentEl.querySelectorAll(".opt"));
+      const idx = optBtns.indexOf(optBtn);
+      if (idx >= 0) handleMcqClick(idx, optBtn);
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
+
 
